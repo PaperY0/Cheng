@@ -22,8 +22,19 @@ const app = express();
 const projectRoot = path.resolve(serverDir, '../../');
 const frontendDist = path.join(projectRoot, 'web', 'dist');
 
-// 允许的本地开发来源
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
+// 允许的来源。生产前端由当前 Express 同域托管，但浏览器 fetch 仍会携带
+// Origin，因此必须把公开站点加入白名单；否则同域的 /api 请求也会被 CORS
+// 中间件误拦截。部署到其他域名时可用 ALLOWED_ORIGINS 覆盖或追加。
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'https://cheng-jing.onrender.com',
+].join(',');
+
+const configuredAllowedOrigins = process.env.ALLOWED_ORIGINS || '';
+const allowedOrigins = `${defaultAllowedOrigins},${configuredAllowedOrigins}`
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
