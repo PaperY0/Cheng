@@ -250,20 +250,26 @@ export async function diagnoseWithQwenVL({ imageBuffer, imageMimeType, designTyp
   let report = extractJson(content);
   let validationErrors = report ? validateReport(report) : ['返回内容不是合法 JSON'];
 
-  // 模型偶尔会返回合法 JSON，但把 issues 写成字符串数组。只重试一次，避免无限消耗额度。
+  // 模型偶尔会返回合法 JSON，但不满足严格字段/条数约束。修复阶段只处理
+  // 首轮文本，绝不重复发送图片；否则会再次触发耗时的视觉推理，既慢又容易超时。
   if (!report || validationErrors.length > 0) {
     const repairBody = {
-      ...body,
       messages: [
-        ...body.messages,
+        {
+          role: 'system',
+          content: buildSystemPrompt(designType, goal, focusDimensions),
+        },
         {
           role: 'user',
-          content: [{
-            type: 'text',
-            text: `上一份输出未通过结构校验：${validationErrors.slice(0, 4).join('；')}。请重新输出完整报告。只允许输出 JSON；issues 必须是恰好 3 个对象组成的数组，不能出现字符串数组、null 或 issue ID。不要解释原因。`,
-          }],
+          content: `请修复以下诊断结果的 JSON 结构，保留其已有的设计判断，不要重新分析图片，也不要编造新事实。
+校验问题：${validationErrors.slice(0, 4).join('；')}。
+只输出完整合法 JSON；issues 必须是恰好 3 个对象组成的数组，每个对象包含所有要求字段，不能出现字符串数组、null 或 issue ID。
+待修复内容：\n${String(content).slice(0, 24000)}`,
         },
       ],
+      model,
+      stream: false,
+      response_format: { type: 'json_object' },
     };
     content = await requestModel(repairBody);
     report = extractJson(content);
