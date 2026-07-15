@@ -62,68 +62,75 @@ function render() {
 
   let activeKey = '';
   let content = '';
+  let renderFailed = false;
 
-  switch (nextRouteName) {
-    case 'home':
-      activeKey = '';
-      content = renderHome();
-      break;
-    case 'diagnosis-new':
-      activeKey = 'diagnosis';
-      content = renderDiagnosisNew();
-      break;
-    case 'history':
-      activeKey = '';
-      content = renderHistory();
-      break;
-    case 'profile':
-      activeKey = 'profile';
-      content = renderProfile();
-      break;
-    case 'training':
-      activeKey = 'training';
-      content = renderTraining();
-      break;
-    case 'training-compare':
-      activeKey = 'training';
-      content = renderTrainingCompare();
-      break;
-    case 'training-spot':
-      activeKey = 'training';
-      content = renderTrainingSpot();
-      break;
-    case 'training-scoring':
-      activeKey = 'training';
-      content = renderTrainingScoring();
-      break;
-    case 'diagnosis-setup':
-      activeKey = 'diagnosis';
-      content = renderDiagnosisSetup(params.taskId);
-      break;
-    case 'diagnosis-processing':
-      activeKey = 'diagnosis';
-      content = renderDiagnosisProcessing(params.taskId);
-      break;
-    case 'diagnosis-report':
-      activeKey = 'diagnosis';
-      content = renderDiagnosisReport(params.taskId);
-      break;
-    case 'diagnosis-compare':
-      activeKey = 'diagnosis';
-      content = renderCompare(params.taskId);
-      break;
-    case 'not-found':
-    default:
-      activeKey = '';
-      content = renderNotFound(path);
-      break;
+  try {
+    switch (nextRouteName) {
+      case 'home':
+        activeKey = '';
+        content = renderHome();
+        break;
+      case 'diagnosis-new':
+        activeKey = 'diagnosis';
+        content = renderDiagnosisNew();
+        break;
+      case 'history':
+        activeKey = '';
+        content = renderHistory();
+        break;
+      case 'profile':
+        activeKey = 'profile';
+        content = renderProfile();
+        break;
+      case 'training':
+        activeKey = 'training';
+        content = renderTraining();
+        break;
+      case 'training-compare':
+        activeKey = 'training';
+        content = renderTrainingCompare();
+        break;
+      case 'training-spot':
+        activeKey = 'training';
+        content = renderTrainingSpot();
+        break;
+      case 'training-scoring':
+        activeKey = 'training';
+        content = renderTrainingScoring();
+        break;
+      case 'diagnosis-setup':
+        activeKey = 'diagnosis';
+        content = renderDiagnosisSetup(params.taskId);
+        break;
+      case 'diagnosis-processing':
+        activeKey = 'diagnosis';
+        content = renderDiagnosisProcessing(params.taskId);
+        break;
+      case 'diagnosis-report':
+        activeKey = 'diagnosis';
+        content = renderDiagnosisReport(params.taskId);
+        break;
+      case 'diagnosis-compare':
+        activeKey = 'diagnosis';
+        content = renderCompare(params.taskId);
+        break;
+      case 'not-found':
+      default:
+        activeKey = '';
+        content = renderNotFound(path);
+        break;
+    }
+  } catch (error) {
+    renderFailed = true;
+    console.error('[page-content-render-error]', error);
+    content = renderPageError('页面内容加载失败，请刷新后重试');
   }
 
   app.innerHTML = renderPage(activeKey, content);
 
   // 渲染顺序：先生成静态壳 → 执行 mount（mount 内部会 rerender 动态插入 data-reveal）
   // → mount 完成后再执行 afterRender，确保动态插入的元素也被扫描到
-  const entry = pageRegistry[nextRouteName];
+  const entry = renderFailed ? null : pageRegistry[nextRouteName];
   try {
     if (entry && entry.mount) {
       entry.mount();
