@@ -6,6 +6,14 @@ import { ApiError } from '../middleware/errorHandler.js';
 const ALLOWED_DIMENSIONS = ['layout', 'color', 'typography', 'whitespace'];
 const ALLOWED_SEVERITY = ['high', 'medium', 'low'];
 
+function getTimeoutMs(value) {
+  const parsed = Number.parseInt(value, 10);
+  // 视觉模型在冷启动或处理较大设计稿时通常需要超过 30 秒；仍给出上限，
+  // 防止异常连接无限占用 Render 的请求资源。
+  if (!Number.isFinite(parsed)) return 90000;
+  return Math.min(Math.max(parsed, 10000), 120000);
+}
+
 // 构建 system prompt，引导模型输出结构化 JSON
 function buildSystemPrompt(designType, goal, focusDimensions) {
   const typeLabel = designType === 'ui' ? '界面设计（UI）' : '平面设计';
@@ -155,6 +163,7 @@ export async function diagnoseWithQwenVL({ imageBuffer, imageMimeType, designTyp
     .replace(/^['"]|['"]$/g, '');
   const baseUrl = process.env.DASHSCOPE_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1';
   const model = process.env.DASHSCOPE_MODEL || 'qwen3-vl-flash';
+  const timeoutMs = getTimeoutMs(process.env.DASHSCOPE_TIMEOUT_MS);
 
   // 配置校验
   if (!apiKey) {
@@ -188,7 +197,7 @@ export async function diagnoseWithQwenVL({ imageBuffer, imageMimeType, designTyp
 
   async function requestModel(requestBody) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     let res;
     try {
       res = await fetch(`${baseUrl}/chat/completions`, {
@@ -202,7 +211,7 @@ export async function diagnoseWithQwenVL({ imageBuffer, imageMimeType, designTyp
       });
     } catch (err) {
       if (err.name === 'AbortError') {
-        throw new ApiError('QWEN_PROVIDER_ERROR', '通义千问 VL 请求超时（30秒）', 504);
+        throw new ApiError('QWEN_PROVIDER_ERROR', `通义千问 VL 请求超时（${Math.round(timeoutMs / 1000)}秒）`, 504);
       }
       throw new ApiError('QWEN_PROVIDER_ERROR', `通义千问 VL 网络错误: ${err.message}`, 502);
     } finally {
