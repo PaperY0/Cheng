@@ -357,7 +357,15 @@ async function generatePreview(issueId, prompt) {
     if (task.goal) formData.append('goal', task.goal);
 
     const res = await fetch('/api/generate-preview', { method: 'POST', body: formData });
-    const data = await res.json();
+    // Render/上游网关异常时可能返回 HTML 错误页。不能直接 res.json()，
+    // 否则用户会看到 "Unexpected token '<'" 这类内部技术信息。
+    const rawBody = await res.text();
+    let data = null;
+    try {
+      data = rawBody ? JSON.parse(rawBody) : null;
+    } catch (_) {
+      throw new Error(`生图服务暂时返回异常页面（HTTP ${res.status}），请稍后重试`);
+    }
 
     if (!res.ok || data.status !== 'success') {
       const msg = mapErrorMessage(res.status, data);
