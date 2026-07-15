@@ -29,10 +29,25 @@ function getApiKey() {
     .replace(/^['"]|['"]$/g, '');
 }
 
+function resolveImageBaseUrl() {
+  const explicit = String(process.env.QWEN_IMAGE_BASE_URL || '').trim();
+  if (explicit) return explicit;
+
+  // Render 环境通常只配置了诊断端点，例如：
+  // https://{workspace}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+  // 原生生图 API 使用相同业务空间的 origin + /api/v1/... 路径，可安全推导。
+  const visionBase = String(process.env.DASHSCOPE_BASE_URL || '').trim();
+  try {
+    return visionBase ? new URL(visionBase).origin : '';
+  } catch (_) {
+    return '';
+  }
+}
+
 // 生图专用配置：与诊断配置完全隔离
 function getImageConfig() {
   const apiKey = getApiKey();
-  const baseUrl = process.env.QWEN_IMAGE_BASE_URL || '';
+  const baseUrl = resolveImageBaseUrl();
   const model = process.env.QWEN_IMAGE_MODEL || 'wan2.6-image';
   const timeoutMs = Number(process.env.QWEN_IMAGE_TIMEOUT_MS) || 60000;
   const styleProfile = process.env.QWEN_IMAGE_STYLE_PROFILE || '';
