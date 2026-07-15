@@ -1,16 +1,99 @@
-// 任务内存存储（模块级，不持久化，刷新即丢失）
-// 当前阶段只保存最近创建的任务，供诊断流程页面读取
+// 当前诊断任务：内存用于即时交互，localStorage 用于刷新/恢复后的继续诊断。
+// 图片只以 data URL 持久化，运行期预览仍使用 Blob URL，避免内存泄漏。
 
 let currentTask = null;
 const RECENT_KEY = 'meishang.recentDiagnoses';
+const ACTIVE_TASK_KEY = 'meishang.activeDiagnosis';
+
+function readStorage(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '');
+    return value || fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function persistCurrentTask() {
+  if (!currentTask) return;
+  const image = currentTask.image || {};
+  const record = {
+    ...currentTask,
+    image: {
+      name: image.name || '未命名图片',
+      size: image.size || 0,
+      type: image.type || 'image/png',
+      width: image.width || 0,
+      height: image.height || 0,
+      // 只保存可跨刷新恢复的数据，不保存临时 blob: URL / File 对象。
+      dataUrl: image.dataUrl || null,
+    },
+  };
+  try {
+    localStorage.setItem(ACTIVE_TASK_KEY, JSON.stringify(record));
+  } catch (_) {
+    // localStorage 容量不足时不影响当前流程；内存任务仍可继续完成诊断。
+  }
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve) => {
+    if (!(file instanceof File)) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+function restoreImage(image = {}) {
+  const restored = { ...image, url: null, file: null };
+  if (!image.dataUrl || typeof File === 'undefined' || typeof URL === 'undefined') return restored;
+  try {
+    const [header, encoded] = image.dataUrl.split(',', 2);
+    const mime = /^data:([^;]+);base64$/i.exec(header)?.[1] || image.type || 'image/png';
+    const binary = atob(encoded || '');
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+    const file = new File([bytes], image.name || 'design-image', { type: mime });
+    restored.file = file;
+    restored.url = URL.createObjectURL(file);
+  } catch (_) {
+    // 损坏的本地缓存不阻断报告查看；重新上传即可再次诊断。
+  }
+  return restored;
+}
+
+function restoreActiveTask(taskId) {
+  const record = readStorage(ACTIVE_TASK_KEY, null);
+  if (!record || !record.taskId || (taskId && record.taskId !== taskId)) return null;
+  currentTask = {
+    ...record,
+    image: restoreImage(record.image),
+    previewImages: record.previewImages || {},
+  };
+  return currentTask;
+}
 
 export function setTask(task) {
   currentTask = task;
+  persistCurrentTask();
+  // FileReader 异步读取不阻塞跳转；读取完成后刷新持久化记录。
+  const file = task?.image?.file;
+  if (typeof File !== 'undefined' && file instanceof File) {
+    fileToDataUrl(file).then((dataUrl) => {
+      if (!dataUrl || !currentTask || currentTask.taskId !== task.taskId) return;
+      currentTask.image.dataUrl = dataUrl;
+      persistCurrentTask();
+    });
+  }
 }
 
 export function getTask(taskId) {
   if (currentTask && (!taskId || currentTask.taskId === taskId)) return currentTask;
   if (!taskId) return null;
+  const activeTask = restoreActiveTask(taskId);
+  if (activeTask) return activeTask;
   try {
     const records = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
     const record = records.find((item) => item.taskId === taskId && item.report);
@@ -38,6 +121,7 @@ export function updateTaskStatus(taskId, status) {
   if (!currentTask) return;
   if (taskId && currentTask.taskId !== taskId) return;
   currentTask.status = status;
+  persistCurrentTask();
 }
 
 // 更新任务报告
@@ -48,6 +132,7 @@ export function updateTaskReport(taskId, report, provider) {
   if (provider) currentTask.provider = provider;
   // 初始化 previewImages 容器（实际数据由 updatePreviewImage 写入）
   if (!currentTask.previewImages) currentTask.previewImages = {};
+  persistCurrentTask();
 }
 
 // 更新单条 issue 的效果图状态（写回内存 task）
@@ -63,6 +148,7 @@ export function updatePreviewImage(taskId, issueId, state) {
     generatedAt: state.generatedAt || null,
     error: state.error || null,
   };
+  persistCurrentTask();
 }
 
 // 获取单条 issue 的效果图状态
