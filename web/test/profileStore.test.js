@@ -49,6 +49,8 @@ test('清空历史后，旧的诊断来源记录不会被自动重新导入', ()
   assert.equal(clearHistory(), true);
   assert.equal(getAllHistory().length, 0);
   assert.doesNotMatch(renderHome(), /old-task\.png/);
+  assert.match(renderHome(), /开始你的练习/);
+  assert.doesNotMatch(renderHome(), /今日已完成 3\/10 题/);
 
   setRecentDiagnoses([
     diagnosis('future-task', new Date(Date.now() + 60_000).toISOString()),

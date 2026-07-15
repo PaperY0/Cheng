@@ -4,6 +4,9 @@ import { getHistoryByType } from '../profileStore.js';
 
 export function renderHome() {
   const recent = getHistoryByType('diagnosis').slice(0, 3);
+  const trainingHistory = getHistoryByType('training');
+  const hasTrainingHistory = trainingHistory.length > 0;
+  const trainingProgress = Math.min(trainingHistory.length * 10, 100);
   return `
   <!-- Hero -->
   <section class="relative flex min-h-[78vh] flex-col items-center justify-center px-6 text-center" style="padding-top:96px;padding-bottom:48px;">
@@ -52,21 +55,21 @@ export function renderHome() {
             <i data-lucide="dumbbell" class="w-5 h-5" style="color:var(--foreground);"></i>
           </span>
           <div>
-            <h3 style="font-weight:600;color:var(--foreground);">继续你的练习</h3>
-            <p class="mt-1 text-sm" style="color:var(--muted-foreground);">今日已完成 3/10 题 · 连续打卡 5 天</p>
+            <h3 style="font-weight:600;color:var(--foreground);">${hasTrainingHistory ? '继续你的练习' : '开始你的练习'}</h3>
+            <p class="mt-1 text-sm" style="color:var(--muted-foreground);">${hasTrainingHistory ? `已完成 ${trainingHistory.length} 次训练，持续积累你的设计判断力` : '还没有训练记录，从第一轮练习开始吧。'}</p>
           </div>
         </div>
         <div class="flex-1 md:mx-8">
           <div class="mb-2 flex items-center justify-between">
-            <span class="text-xs" style="color:var(--muted-foreground);">今日进度</span>
-            <span class="text-xs" style="color:var(--foreground);font-weight:600;">30%</span>
+            <span class="text-xs" style="color:var(--muted-foreground);">${hasTrainingHistory ? '训练进度' : '准备开始'}</span>
+            <span class="text-xs" style="color:var(--foreground);font-weight:600;">${trainingProgress}%</span>
           </div>
           <div class="h-2 w-full rounded-full" style="background:var(--secondary);">
-            <div class="h-2 rounded-full" style="width:30%;background:var(--foreground);"></div>
+            <div class="h-2 rounded-full" style="width:${trainingProgress}%;background:var(--foreground);"></div>
           </div>
         </div>
         <a href="/training" data-link="/training" class="inline-flex h-11 shrink-0 items-center justify-center rounded-full px-6 transition-transform hover:scale-[1.02]" style="background:var(--foreground);color:var(--background);font-size:15px;font-weight:600;">
-          继续训练
+          ${hasTrainingHistory ? '继续训练' : '开始训练'}
         </a>
       </div>
     </div>
