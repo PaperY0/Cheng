@@ -59,6 +59,22 @@ function getImageConfig() {
   return { apiKey, baseUrl, model, timeoutMs, styleProfile, referenceImages };
 }
 
+// 仅供健康检查使用：返回配置是否到达运行进程，绝不返回密钥或完整端点。
+// 这样可以区分「Render 没有注入环境变量」和「第三方模型调用失败」。
+export function getImageServiceStatus() {
+  const explicitBaseUrl = String(process.env.QWEN_IMAGE_BASE_URL || '').trim();
+  const visionBaseUrl = String(process.env.DASHSCOPE_BASE_URL || '').trim();
+  const config = getImageConfig();
+
+  return {
+    enabled: String(process.env.AI_IMAGE_PROVIDER || '').trim() === 'qwen-image',
+    apiKeyConfigured: Boolean(config.apiKey),
+    baseUrlResolved: Boolean(config.baseUrl),
+    baseUrlSource: explicitBaseUrl ? 'QWEN_IMAGE_BASE_URL' : visionBaseUrl ? 'DASHSCOPE_BASE_URL' : null,
+    model: config.model,
+  };
+}
+
 // 将 Buffer 转为 base64 data URL（模型支持的图片输入格式）
 function bufferToDataUrl(buffer, mimeType) {
   const base64 = buffer.toString('base64');
