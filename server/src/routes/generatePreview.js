@@ -185,6 +185,9 @@ router.post('/', upload.single('image'), async (req, res, next) => {
         goal: goal || '',
         modelOverride: fallbackModel,
         timeoutOverride: Number(process.env.QWEN_IMAGE_FALLBACK_TIMEOUT_MS) || 45000,
+        // Render 位于美国，直连北京 workspace 域名会长时间无响应；
+        // image2 降级改走已用真实 Key 验证过的百炼公共入口。
+        baseUrlOverride: String(process.env.QWEN_IMAGE_FALLBACK_BASE_URL || 'https://dashscope.aliyuncs.com').trim(),
       });
       return res.json({
         taskId,

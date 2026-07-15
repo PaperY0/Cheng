@@ -229,9 +229,10 @@ function isApiKeyError(status, errData) {
  *
  * 禁止：写磁盘、返回 API Key、伪造 URL、返回诊断 JSON
  */
-export async function generateImageWithQwenImage({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride, timeoutOverride }) {
+export async function generateImageWithQwenImage({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride, timeoutOverride, baseUrlOverride }) {
   const config = getImageConfig();
-  const { apiKey, baseUrl, styleProfile, referenceImages } = config;
+  const { apiKey, styleProfile, referenceImages } = config;
+  const baseUrl = String(baseUrlOverride || config.baseUrl || '').trim();
   const model = modelOverride || config.model;
   const timeoutMs = timeoutOverride || config.timeoutMs;
 
