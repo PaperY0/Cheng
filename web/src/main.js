@@ -16,6 +16,7 @@ import { releaseTaskImage, clearTask } from './taskStore.js';
 import { revealElements } from './reveal.js';
 
 const app = document.getElementById('app');
+window.__meishangAppMounted = true;
 
 let currentUnmount = null;
 let currentRouteName = '';
