@@ -1,0 +1,306 @@
+{
+  "project": {
+    "name": "美商培养工具站",
+    "path": "c:\\Users\\wsy19\\Desktop\\Trae\\meishang-tool-station",
+    "operation": "create",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "dashboardMode": false,
+    "replicationMode": null,
+    "sourceUrl": null,
+    "visualSpecExcerpt": null,
+    "styleDefinitionBrief": "审美培养工具站，苹果风格约束，DM Sans + JetBrains Mono，蓝绿色主调#007aff，中性色背景，充足留白，editorial calm tone",
+    "designRead": "Aesthetics training web app / AI creators & developers / calm editorial professional / medium density / avoid neon tech aesthetic",
+    "designDials": {
+      "layoutVariance": 3,
+      "motionIntensity": 2,
+      "visualDensity": 3
+    },
+    "styleContinuityAnchors": {
+      "colorSystem": {
+        "primaryColorRole": "Pinguo Blue #007aff for primary CTA and selected states",
+        "brandHuePolicy": "Single brand hue (blue), neutral grays for backgrounds, no secondary accent hue",
+        "stateColors": "Green #34c759 for success, Red #ff3b30 for error"
+      },
+      "shapeSystem": "Global radius 1.2rem (19.2px), pill-shaped buttons, rounded cards",
+      "typographySystem": "DM Sans for all UI, JetBrains Mono for technical/numeric, hero 72-96px/600/-0.04em, body 14-16px/400/1.55",
+      "spacingSystem": "Base 0.24rem, scale 4/8/12/16/24/32/48/64/96/128, whitespace over separators",
+      "componentLanguage": "Border-defined cards with whisper-light shadows, capsule buttons, Apple-store-like navigation",
+      "surfaceAndDepth": "1px borders first, shadow-2xs at rest, deeper elevation for hover/overlay only",
+      "imageryAndIconography": "Centered product photography on white/black grounds, no illustration/emoji mixing",
+      "interactionTone": "Calm, precise, cubic-bezier(0.32,0.72,0,1) motion at 150/250/350ms"
+    },
+    "specsConstraints": null,
+    "sharedProjectShellContract": {
+      "navigationShell": "Sticky top navbar with logo, nav links (立即诊断/审美训练/知识库即将上线/素材库即将上线), user menu on right",
+      "primaryColorSystem": "Pinguo Blue #007aff as single brand hue",
+      "typographySystem": "DM Sans UI + JetBrains Mono technical, hero 72-96px/600, body 14-16px/400",
+      "radiusScale": "Global 19.2px, pill buttons, rounded cards/inputs",
+      "surfaceDepthModel": "1px border first, whisper-light shadow at rest, deeper for hover/overlay",
+      "ctaStyle": "Pill-shaped capsule buttons, blue primary, gray secondary",
+      "alignmentRules": "12-column web grid, 4-column mobile, broad section gaps"
+    },
+    "generationTree": {
+      "root": {
+        "nodeId": "gen-project-shell",
+        "kind": "project-shell",
+        "pageIds": ["page-index", "page-training", "page-diagnosis", "page-profile"],
+        "output": "partials/project-shell.html",
+        "sharedRegions": ["navbar", "footer"],
+        "privateRegions": [],
+        "mutableSlots": ["activeNavItem", "pageTitle", "pageContent"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-page-index",
+            "kind": "page-leaf",
+            "pageIds": ["page-index"],
+            "output": "pages/index.html",
+            "sharedRegions": [],
+            "privateRegions": ["hero section", "progress strip", "pain points", "feature showcase", "subscription"],
+            "mutableSlots": ["activeNavItem"],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-training",
+            "kind": "page-leaf",
+            "pageIds": ["page-training"],
+            "output": "pages/training.html",
+            "sharedRegions": [],
+            "privateRegions": ["suggestion banner", "mode tabs", "question area", "analysis panel", "progress stats"],
+            "mutableSlots": ["activeNavItem"],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-diagnosis",
+            "kind": "page-leaf",
+            "pageIds": ["page-diagnosis"],
+            "output": "pages/diagnosis.html",
+            "sharedRegions": [],
+            "privateRegions": ["result header", "tab switcher", "overview tab content", "sticky action bar"],
+            "mutableSlots": ["activeNavItem"],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-profile",
+            "kind": "page-leaf",
+            "pageIds": ["page-profile"],
+            "output": "pages/profile.html",
+            "sharedRegions": [],
+            "privateRegions": ["ability profile panel", "dimension score chart", "recommended practice", "training overview", "diagnosis history"],
+            "mutableSlots": ["activeNavItem"],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      }
+    }
+  },
+  "designSource": {
+    "operatingMode": "library-bound",
+    "libraryIdentity": {
+      "name": "苹果",
+      "id": "dl_builtin_apple",
+      "version": null,
+      "scope": "built-in-global",
+      "path": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple",
+      "versionSource": "metadata.json"
+    },
+    "libraryPath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple",
+    "cssFilePath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\colors_and_type.css",
+    "brandPrefix": "brand",
+    "themeMode": "light",
+    "designDecisionSummary": "Apple-inspired restrained design: Pinguo Blue #007aff, DM Sans + JetBrains Mono, 1.2rem radius, 0.24rem spacing base, whisper-light shadows, editorial calm voice",
+    "componentContractKind": "legacy-json",
+    "forbiddenInventedComponents": [],
+    "allowedComponents": ["button", "card", "input", "navigation", "product-grid", "comparison-table"],
+    "styleConstraints": {
+      "radiusMax": 19.2,
+      "spacingBase": 3.84,
+      "fontSizeBody": 14,
+      "fontSizeMin": 12,
+      "controlHeightDefault": 44,
+      "controlHeightLarge": 52
+    },
+    "productContext": {
+      "kitType": "app",
+      "productType": "consumer imaging product ecosystem"
+    },
+    "actualTokenNameReference": [
+      {"semanticPurpose": "Primary brand color", "tokenName": "--primary"},
+      {"semanticPurpose": "Primary brand color (raw)", "tokenName": "--brand-500"},
+      {"semanticPurpose": "Page background", "tokenName": "--background"},
+      {"semanticPurpose": "Card background", "tokenName": "--card"},
+      {"semanticPurpose": "Primary text", "tokenName": "--foreground"},
+      {"semanticPurpose": "Muted text", "tokenName": "--muted-foreground"},
+      {"semanticPurpose": "Border", "tokenName": "--border"},
+      {"semanticPurpose": "Input background", "tokenName": "--input"},
+      {"semanticPurpose": "Secondary background", "tokenName": "--secondary"},
+      {"semanticPurpose": "Success state", "tokenName": "--state-success"},
+      {"semanticPurpose": "Error state", "tokenName": "--state-error"},
+      {"semanticPurpose": "Ring/focus", "tokenName": "--ring"}
+    ]
+  },
+  "pages": [
+    {
+      "nodeId": "page-index",
+      "slug": "index",
+      "title": "首页",
+      "htmlSrc": "pages/index.html",
+      "pageIndex": 1,
+      "stateGroupId": null,
+      "stateRole": null,
+      "baseStatePageId": null,
+      "sharedShellContract": ["navbar", "footer"],
+      "mutableRegions": [],
+      "derivedFromHtmlSrc": null,
+      "derivationType": "original",
+      "sourcePageId": null,
+      "sourceHtmlSrc": null,
+      "pageType": "showcase",
+      "businessScenario": "美商培养工具站首页，展示产品价值主张，引导用户开始诊断或训练",
+      "visualNorthStar": "Apple Store式的editorial首页，大留白hero区，蓝色CTA按钮，下方进度条带展示个性化推荐",
+      "compositionPattern": "Hero with asymmetric value proposition, progress strip, 3-column pain points, 5-module feature grid",
+      "continuityAnchors": ["navbar with pill buttons", "editorial headline style", "whitespace-led sections"],
+      "libraryRestraintMode": false,
+      "uiKitPath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\ui_kits\\website\\index.html",
+      "componentPlan": [
+        {"slug": "navigation", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\navigation.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-navigation.html"},
+        {"slug": "button", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\button.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-button.html"},
+        {"slug": "card", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\card.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-card.html"}
+      ],
+      "imagePlan": [
+        {"filename": "hero-main.jpg", "role": "critical-hero", "sectionType": "hero", "status": "planned"}
+      ],
+      "chartsRequired": false
+    },
+    {
+      "nodeId": "page-training",
+      "slug": "training",
+      "title": "审美训练",
+      "htmlSrc": "pages/training.html",
+      "pageIndex": 2,
+      "stateGroupId": null,
+      "stateRole": null,
+      "baseStatePageId": null,
+      "sharedShellContract": ["navbar", "footer"],
+      "mutableRegions": [],
+      "derivedFromHtmlSrc": null,
+      "derivationType": "original",
+      "sourcePageId": null,
+      "sourceHtmlSrc": null,
+      "pageType": "task-driven",
+      "businessScenario": "审美训练页，好坏对比模式，展示双图选择+AI解析展开+下一题流转",
+      "visualNorthStar": "干净的双图对比布局，选择后原地展开AI解析面板，底部进度统计条",
+      "compositionPattern": "Suggestion banner + tab switcher + dual-image comparison + expandable analysis panel + progress bar",
+      "continuityAnchors": ["navbar with pill buttons", "card-based content areas", "editorial spacing"],
+      "libraryRestraintMode": false,
+      "uiKitPath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\ui_kits\\website\\index.html",
+      "componentPlan": [
+        {"slug": "navigation", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\navigation.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-navigation.html"},
+        {"slug": "button", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\button.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-button.html"},
+        {"slug": "card", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\card.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-card.html"}
+      ],
+      "imagePlan": [
+        {"filename": "training-design-a.jpg", "role": "supporting-content", "sectionType": "feature", "status": "planned"},
+        {"filename": "training-design-b.jpg", "role": "supporting-content", "sectionType": "feature", "status": "planned"}
+      ],
+      "chartsRequired": false
+    },
+    {
+      "nodeId": "page-diagnosis",
+      "slug": "diagnosis",
+      "title": "AI诊断结果",
+      "htmlSrc": "pages/diagnosis.html",
+      "pageIndex": 3,
+      "stateGroupId": null,
+      "stateRole": null,
+      "baseStatePageId": null,
+      "sharedShellContract": ["navbar", "footer"],
+      "mutableRegions": [],
+      "derivedFromHtmlSrc": null,
+      "derivationType": "original",
+      "sourcePageId": null,
+      "sourceHtmlSrc": null,
+      "pageType": "task-driven",
+      "businessScenario": "AI诊断结果页，概览标签展示雷达图+维度明细+问题列表+sticky底部复制提示词栏",
+      "visualNorthStar": "专业诊断报告感，左侧雷达图右侧维度明细，下方问题列表可展开，底部固定操作栏",
+      "compositionPattern": "Result header + tab switcher + radar chart with dimension details + expandable issue list + sticky action bar",
+      "continuityAnchors": ["navbar with pill buttons", "card-based content areas", "editorial spacing"],
+      "libraryRestraintMode": false,
+      "uiKitPath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\ui_kits\\website\\index.html",
+      "componentPlan": [
+        {"slug": "navigation", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\navigation.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-navigation.html"},
+        {"slug": "button", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\button.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-button.html"},
+        {"slug": "card", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\card.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-card.html"},
+        {"slug": "comparison-table", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\comparison-table.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-comparison-table.html"}
+      ],
+      "imagePlan": [
+        {"filename": "diagnosis-upload.jpg", "role": "supporting-content", "sectionType": "detail", "status": "planned"}
+      ],
+      "chartsRequired": true
+    },
+    {
+      "nodeId": "page-profile",
+      "slug": "profile",
+      "title": "个人中心",
+      "htmlSrc": "pages/profile.html",
+      "pageIndex": 4,
+      "stateGroupId": null,
+      "stateRole": null,
+      "baseStatePageId": null,
+      "sharedShellContract": ["navbar", "footer"],
+      "mutableRegions": [],
+      "derivedFromHtmlSrc": null,
+      "derivationType": "original",
+      "sourcePageId": null,
+      "sourceHtmlSrc": null,
+      "pageType": "information-dense",
+      "businessScenario": "个人中心，能力画像面板展示4维度得分曲线+推荐优先练习项+训练进度+诊断历史",
+      "visualNorthStar": "Apple风格的个人中心，能力画像面板占据主视觉，折线图展示维度趋势，推荐卡片引导练习",
+      "compositionPattern": "Ability profile panel with score chart + recommended practice cards + training overview + diagnosis history list",
+      "continuityAnchors": ["navbar with pill buttons", "card-based content areas", "editorial spacing"],
+      "libraryRestraintMode": false,
+      "uiKitPath": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\ui_kits\\website\\index.html",
+      "componentPlan": [
+        {"slug": "navigation", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\navigation.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-navigation.html"},
+        {"slug": "button", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\button.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-button.html"},
+        {"slug": "card", "contractKind": "legacy-json", "contractFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\card.json", "previewFile": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-card.html"}
+      ],
+      "imagePlan": [],
+      "chartsRequired": true
+    }
+  ],
+  "assets": [
+    {"filename": "hero-main.jpg", "role": "critical-hero", "sectionType": "hero", "owningPage": "首页", "status": "planned"},
+    {"filename": "training-design-a.jpg", "role": "supporting-content", "sectionType": "feature", "owningPage": "审美训练", "status": "planned"},
+    {"filename": "training-design-b.jpg", "role": "supporting-content", "sectionType": "feature", "owningPage": "审美训练", "status": "planned"},
+    {"filename": "diagnosis-upload.jpg", "role": "supporting-content", "sectionType": "detail", "owningPage": "AI诊断结果", "status": "planned"}
+  ],
+  "wiringPlan": [
+    {"sourcePageId": "page-index", "targetPageId": "page-training", "domId": "cta-training", "hideEdge": false, "transitionLabel": "开始训练"},
+    {"sourcePageId": "page-training", "targetPageId": "page-diagnosis", "domId": "cta-diagnosis", "hideEdge": false, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-diagnosis", "targetPageId": "page-profile", "domId": "cta-profile", "hideEdge": false, "transitionLabel": "查看画像"}
+  ],
+  "hiddenInteractionPlan": [
+    {"sourcePageId": "page-index", "targetPageId": "page-diagnosis", "domId": "cta-diagnosis-hero", "hideEdge": true, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-training", "targetPageId": "page-index", "domId": "back-index", "hideEdge": true, "transitionLabel": "返回"},
+    {"sourcePageId": "page-diagnosis", "targetPageId": "page-index", "domId": "back-index", "hideEdge": true, "transitionLabel": "返回"},
+    {"sourcePageId": "page-profile", "targetPageId": "page-index", "domId": "back-index", "hideEdge": true, "transitionLabel": "返回"},
+    {"sourcePageId": "page-index", "targetPageId": "page-profile", "domId": "nav-profile", "hideEdge": true, "transitionLabel": "个人中心"},
+    {"sourcePageId": "page-index", "targetPageId": "page-diagnosis", "domId": "nav-diagnosis", "hideEdge": true, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-index", "targetPageId": "page-training", "domId": "nav-training", "hideEdge": true, "transitionLabel": "审美训练"},
+    {"sourcePageId": "page-training", "targetPageId": "page-diagnosis", "domId": "nav-diagnosis", "hideEdge": true, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-training", "targetPageId": "page-training", "domId": "nav-training", "hideEdge": true, "transitionLabel": "审美训练"},
+    {"sourcePageId": "page-training", "targetPageId": "page-profile", "domId": "nav-profile", "hideEdge": true, "transitionLabel": "个人中心"},
+    {"sourcePageId": "page-diagnosis", "targetPageId": "page-diagnosis", "domId": "nav-diagnosis", "hideEdge": true, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-diagnosis", "targetPageId": "page-training", "domId": "nav-training", "hideEdge": true, "transitionLabel": "审美训练"},
+    {"sourcePageId": "page-diagnosis", "targetPageId": "page-profile", "domId": "nav-profile", "hideEdge": true, "transitionLabel": "个人中心"},
+    {"sourcePageId": "page-profile", "targetPageId": "page-profile", "domId": "nav-profile", "hideEdge": true, "transitionLabel": "个人中心"},
+    {"sourcePageId": "page-profile", "targetPageId": "page-diagnosis", "domId": "nav-diagnosis", "hideEdge": true, "transitionLabel": "立即诊断"},
+    {"sourcePageId": "page-profile", "targetPageId": "page-training", "domId": "nav-training", "hideEdge": true, "transitionLabel": "审美训练"}
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "root": {
+    "nodeId": "gen-project-shell",
+    "kind": "project-shell",
+    "pageIds": ["page-index", "page-training", "page-diagnosis", "page-profile"],
+    "output": "partials/project-shell.html",
+    "sharedRegions": ["navbar", "footer"],
+    "privateRegions": [],
+    "mutableSlots": ["activeNavItem", "pageTitle", "pageContent"],
+    "status": "generated",
+    "children": [
+      {
+        "nodeId": "gen-page-index",
+        "kind": "page-leaf",
+        "pageIds": ["page-index"],
+        "output": "pages/index.html",
+        "sharedRegions": [],
+        "privateRegions": ["hero section", "progress strip", "pain points", "feature showcase", "subscription"],
+        "mutableSlots": ["activeNavItem"],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-training",
+        "kind": "page-leaf",
+        "pageIds": ["page-training"],
+        "output": "pages/training.html",
+        "sharedRegions": [],
+        "privateRegions": ["suggestion banner", "mode tabs", "question area", "analysis panel", "progress stats"],
+        "mutableSlots": ["activeNavItem"],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-diagnosis",
+        "kind": "page-leaf",
+        "pageIds": ["page-diagnosis"],
+        "output": "pages/diagnosis.html",
+        "sharedRegions": [],
+        "privateRegions": ["result header", "tab switcher", "overview tab content", "sticky action bar"],
+        "mutableSlots": ["activeNavItem"],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-profile",
+        "kind": "page-leaf",
+        "pageIds": ["page-profile"],
+        "output": "pages/profile.html",
+        "sharedRegions": [],
+        "privateRegions": ["ability profile panel", "dimension score chart", "recommended practice", "training overview", "diagnosis history"],
+        "mutableSlots": ["activeNavItem"],
+        "status": "planned",
+        "children": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,458 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 2540,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": [
+          {
+            "domId": "cta-diagnosis-hero",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": false,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "cta-training",
+            "targetPageId": "page-training",
+            "hideEdge": false,
+            "transitionLabel": "开始训练"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-training",
+      "title": "审美训练",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 624,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/training.html",
+        "interactions": [
+          {
+            "domId": "cta-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": false,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-diagnosis",
+      "title": "AI诊断结果",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/diagnosis.html",
+        "interactions": [
+          {
+            "domId": "cta-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": false,
+            "transitionLabel": "查看画像"
+          },
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-profile",
+      "title": "个人中心",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html",
+        "interactions": [
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-diagnosis-upload",
+      "title": "诊断入口",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783914600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1869,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/diagnosis-upload.html",
+        "interactions": [
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis-upload",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-diagnosis-suggestions",
+      "title": "诊断结果 - 建议",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783914600000,
+      "canvasData": {
+        "x": 1240,
+        "y": 489,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/diagnosis-suggestions.html",
+        "interactions": [
+          {
+            "domId": "cta-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": false,
+            "transitionLabel": "查看画像"
+          },
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-training-scoring",
+      "title": "训练 - 维度打分",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783914600000,
+      "canvasData": {
+        "x": 624,
+        "y": 1908,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/training-scoring.html",
+        "interactions": [
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-quota-wall",
+      "title": "额度墙",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783914600000,
+      "canvasData": {
+        "x": 1240,
+        "y": 1869,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/quota-wall.html",
+        "interactions": [
+          {
+            "domId": "back-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "明天再来"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-index-v2",
+      "title": "首页 - Collection风格变体",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1783915800000,
+      "canvasData": {
+        "x": 60,
+        "y": 900,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index-v2.html",
+        "interactions": [
+          {
+            "domId": "cta-diagnosis-hero",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": false,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "cta-training",
+            "targetPageId": "page-training",
+            "hideEdge": false,
+            "transitionLabel": "开始训练"
+          },
+          {
+            "domId": "nav-diagnosis",
+            "targetPageId": "page-diagnosis",
+            "hideEdge": true,
+            "transitionLabel": "立即诊断"
+          },
+          {
+            "domId": "nav-training",
+            "targetPageId": "page-training",
+            "hideEdge": true,
+            "transitionLabel": "审美训练"
+          },
+          {
+            "domId": "nav-profile",
+            "targetPageId": "page-profile",
+            "hideEdge": true,
+            "transitionLabel": "个人中心"
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-002",
+      "title": "训练范例 - 优秀设计",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 620,
+        "y": 2549
+      },
+      "devMetadata": {
+        "imageSrc": "assets/training-design-a.jpg"
+      }
+    },
+    {
+      "id": "image-003",
+      "title": "训练范例 - 问题设计",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 1240,
+        "y": 2549
+      },
+      "devMetadata": {
+        "imageSrc": "assets/training-design-b.jpg"
+      }
+    },
+    {
+      "id": "image-004",
+      "title": "诊断上传图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1783912268000,
+      "canvasData": {
+        "x": 1860,
+        "y": 2549
+      },
+      "devMetadata": {
+        "imageSrc": "assets/diagnosis-upload.jpg"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "projectName": "美商培养工具站",
+    "designLibrary": {
+      "name": "苹果",
+      "id": "dl_builtin_apple",
+      "version": null,
+      "scope": "built-in-global",
+      "path": "c:\\Users\\wsy19\\.trae-cn\\design_libraries\\dl_builtin_apple",
+      "versionSource": "metadata.json"
+    }
+  }
+}

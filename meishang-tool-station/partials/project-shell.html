@@ -1,0 +1,119 @@
+<!-- ===== Shared Project Shell Fragment ===== -->
+<!-- Node: gen-project-shell | htmlWriteMode: SharedFragmentOnly -->
+<!-- sharedRegions: navbar, footer | mutableSlots: activeNavItem, pageTitle, pageContent -->
+<!-- Library: dl_builtin_apple | Theme: light | Brand: Pinguo Blue #007aff -->
+
+<!-- ===== Sticky Top Navbar ===== -->
+<nav class="sticky top-0 z-50 w-full" style="height:52px;background:var(--card);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);" aria-label="主导航" data-dom-id="navbar">
+  <div class="mx-auto flex h-full max-w-[1200px] items-center gap-6 px-6">
+
+    <!-- Logo -->
+    <a href="#" class="flex shrink-0 items-center whitespace-nowrap" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--foreground);letter-spacing:-0.01em;" data-dom-id="nav-logo" aria-label="美商培养工具站首页">
+      美商
+    </a>
+
+    <!-- Navigation Links -->
+    <div class="flex items-center gap-1">
+      <!-- SLOT: activeNavItem -->
+
+      <!-- 立即诊断 — primary nav item (font-weight emphasis) -->
+      <a href="#" data-dom-id="nav-diagnosis" data-nav-key="diagnosis"
+         class="inline-flex h-8 shrink-0 items-center whitespace-nowrap rounded-full px-3 text-sm font-semibold text-[var(--foreground)] transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2 data-[active=true]:text-[var(--primary)]">
+        立即诊断
+      </a>
+
+      <!-- 审美训练 -->
+      <a href="#" data-dom-id="nav-training" data-nav-key="training"
+         class="inline-flex h-8 shrink-0 items-center whitespace-nowrap rounded-full px-3 text-sm text-[var(--foreground)] transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2 data-[active=true]:text-[var(--primary)]">
+        审美训练
+      </a>
+
+      <!-- 知识库 — disabled, coming soon -->
+      <span data-nav-key="knowledgebase" title="即将上线"
+            class="inline-flex h-8 shrink-0 cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm"
+            style="color:var(--muted-foreground);">
+        知识库
+        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs leading-tight" style="background:var(--secondary);color:var(--muted-foreground);">即将上线</span>
+      </span>
+
+      <!-- 素材库 — disabled, coming soon -->
+      <span data-nav-key="assetlibrary" title="即将上线"
+            class="inline-flex h-8 shrink-0 cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm"
+            style="color:var(--muted-foreground);">
+        素材库
+        <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs leading-tight" style="background:var(--secondary);color:var(--muted-foreground);">即将上线</span>
+      </span>
+    </div>
+
+    <!-- Right side: User menu -->
+    <div class="ml-auto flex shrink-0 items-center">
+      <button type="button" data-dom-id="nav-profile" data-nav-key="profile"
+              class="inline-flex h-8 items-center gap-1.5 rounded-full pl-1.5 pr-2.5 transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+              style="color:var(--foreground);"
+              aria-label="个人中心">
+        <span class="flex h-7 w-7 items-center justify-center rounded-full" style="background:var(--secondary);">
+          <span data-icon class="block h-4 w-4" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/user.svg');mask-image:url('../assets/icons/dl_builtin_apple/user.svg');background-color:var(--muted-foreground);"></span>
+        </span>
+        <span data-icon class="block h-3 w-3" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/chevron-down.svg');mask-image:url('../assets/icons/dl_builtin_apple/chevron-down.svg');"></span>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ===== Page Content Slot ===== -->
+<!-- SLOT: pageContent -->
+
+<!-- ===== Footer ===== -->
+<footer class="w-full" style="background:var(--secondary);border-top:1px solid var(--border);" aria-label="页脚" data-dom-id="footer">
+  <div class="mx-auto max-w-[1200px] px-6" style="padding-top:48px;padding-bottom:48px;">
+    <div class="flex flex-col gap-10">
+
+      <!-- Footer top: brand + link columns -->
+      <div class="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+
+        <!-- Brand block -->
+        <div class="flex flex-col gap-2">
+          <span class="whitespace-nowrap" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--foreground);">美商</span>
+          <p class="max-w-xs text-sm leading-relaxed" style="color:var(--muted-foreground);">AI创作者与开发者的审美培养工具站</p>
+        </div>
+
+        <!-- Link columns -->
+        <nav class="flex flex-wrap gap-x-12 gap-y-6" aria-label="页脚导航">
+          <div class="flex flex-col gap-3">
+            <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">产品</h3>
+            <div class="flex flex-col gap-2">
+              <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">立即诊断</a>
+              <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">审美训练</a>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">资源</h3>
+            <div class="flex flex-col gap-2">
+              <span class="whitespace-nowrap text-sm" style="color:var(--muted-foreground);opacity:0.6;">知识库即将上线</span>
+              <span class="whitespace-nowrap text-sm" style="color:var(--muted-foreground);opacity:0.6;">素材库即将上线</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">账户</h3>
+            <div class="flex flex-col gap-2">
+              <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">个人中心</a>
+            </div>
+          </div>
+        </nav>
+
+      </div>
+
+      <!-- Footer bottom: copyright + legal links -->
+      <div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center md:justify-between" style="border-top:1px solid var(--border);">
+        <span class="whitespace-nowrap text-xs" style="color:var(--muted-foreground);">© 2026 美商培养工具站</span>
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">隐私政策</a>
+          <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">服务条款</a>
+          <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">联系我们</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</footer>

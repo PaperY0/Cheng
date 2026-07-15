@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: meishang-tool-station
+    env: node
+    buildCommand: npm --prefix web ci && npm --prefix web run build && npm --prefix server ci --omit=dev
+    startCommand: npm --prefix server start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production

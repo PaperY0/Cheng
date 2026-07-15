@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI诊断 - 美商培养工具站</title>
+    <style id="theme-vars">
+/*
+ * Pinguo design tokens
+ * Brand: Pinguo
+ * Domain: Consumer imaging product
+ * Style: Restrained, elegant, Apple-inspired
+ * Theme mode: light-dark
+ * Source language: zh
+ * Output language: en
+ *
+ * Color architecture (two layers):
+ *   1. Primitive palette - six categories. brand / background / text / icon
+ *      are each a 10-step scale (50 lightest to 900 darkest). state-success and
+ *      state-error are functional colors anchored on Apple system colors.
+ *      Brand palette updated to teal-cyan (inspired by Apple M-series marketing gradient).
+ *   2. Semantic tokens - :root (light) and .dark map roles onto primitives.
+ *      Components and UI kits must only consume the semantic tokens below.
+ */
+
+/* @group-priority: brand, background, text, icon, state-success, state-error */
+
+:root {
+  /* ===== PRIMITIVE PALETTE ===== */
+
+  /* brand — teal-cyan (Apple M-series marketing gradient inspired) */
+  --brand-50: #ecfeff;
+  --brand-100: #cffafe;
+  --brand-200: #a5f3fc;
+  --brand-300: #67e8f9;
+  --brand-400: #22d3ee;
+  --brand-500: #06b6d4; /* @primary */
+  --brand-600: #0891b2;
+  --brand-700: #0e7490;
+  --brand-800: #155e75;
+  --brand-900: #164e63;
+
+  /* background */
+  --background-50: #ffffff;
+  --background-100: #f7f7fa;
+  --background-200: #f2f2f7;
+  --background-300: #e5e5ea;
+  --background-400: #d1d1d6;
+  --background-500: #aeaeb2;
+  --background-600: #8e8e93;
+  --background-700: #3a3a3c;
+  --background-800: #1c1c1e;
+  --background-900: #000000;
+
+  /* text */
+  --text-50: #f5f5f7;
+  --text-100: #e3e3e8;
+  --text-200: #c7c7cc;
+  --text-300: #aeaeb2;
+  --text-400: #8e8e93;
+  --text-500: #6e6e73;
+  --text-600: #48484a;
+  --text-700: #3c3c43;
+  --text-800: #1d1d1f;
+  --text-900: #000000;
+
+  /* icon */
+  --icon-50: #f5f5f7;
+  --icon-100: #e5e5ea;
+  --icon-200: #d1d1d6;
+  --icon-300: #c7c7cc;
+  --icon-400: #aeaeb2;
+  --icon-500: #8e8e93;
+  --icon-600: #6e6e73;
+  --icon-700: #48484a;
+  --icon-800: #2c2c2e;
+  --icon-900: #1d1d1f;
+
+  /* state-success */
+  --state-success: #34c759; /* @primary */
+  --state-success-dark: #30d158;
+  --state-success-surface: #e9f9ee;
+  --state-success-foreground: #ffffff;
+
+  /* state-error */
+  --state-error: #ff3b30; /* @primary */
+  --state-error-dark: #ff453a;
+  --state-error-surface: #ffecea;
+  --state-error-foreground: #ffffff;
+
+  /* ===== SEMANTIC ROLES ===== */
+
+  /* semantic */
+  --background: var(--background-50);
+  --foreground: var(--text-800);
+  --card: var(--background-50);
+  --card-foreground: var(--text-800);
+  --popover: var(--background-50);
+  --popover-foreground: var(--text-900);
+
+  --primary: var(--brand-500);
+  --primary-foreground: var(--background-50);
+  --secondary: var(--background-200);
+  --secondary-foreground: var(--text-800);
+  --muted: var(--background-200);
+  --muted-foreground: var(--text-400);
+  --accent: var(--background-100);
+  --accent-foreground: var(--text-800);
+  --destructive: var(--state-error);
+  --destructive-foreground: var(--state-error-foreground);
+  --success: var(--state-success);
+  --success-foreground: var(--state-success-foreground);
+  --border: var(--background-300);
+  --input: var(--background-400);
+  --ring: var(--brand-500);
+
+  --icon: var(--icon-900);
+  --icon-muted: var(--icon-500);
+
+  /* chart */
+  --chart-1: var(--state-success);
+  --chart-2: var(--brand-500);
+  --chart-3: #ff9500;
+  --chart-4: #5856d6;
+  --chart-5: #af52de;
+
+  /* sidebar */
+  --sidebar: var(--background-200);
+  --sidebar-foreground: var(--text-800);
+  --sidebar-primary: var(--brand-500);
+  --sidebar-primary-foreground: var(--background-50);
+  --sidebar-accent: var(--background-300);
+  --sidebar-accent-foreground: var(--text-800);
+  --sidebar-border: var(--background-300);
+  --sidebar-ring: var(--brand-500);
+
+  /* TYPOGRAPHY */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+  --tracking-normal: 0em;
+
+  /* RADIUS */
+  --radius: 1.2rem;
+
+  /* SHADOWS */
+  --shadow-2xs: 0 1px 2px -1px rgba(0, 0, 0, 0.04); /* Hairline */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04); /* Subtle */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.05); /* Card */
+  --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.05); /* Raised */
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* Card Hover */
+  --shadow-lg: 0 8px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.05); /* Float */
+  --shadow-xl: 0 16px 40px -10px rgba(0, 0, 0, 0.10), 0 8px 16px -8px rgba(0, 0, 0, 0.06); /* Overlay */
+  --shadow-2xl: 0 24px 64px -12px rgba(0, 0, 0, 0.12); /* Modal */
+
+  /* SPACING */
+  --spacing: 0.24rem;
+}
+
+/* ===== SEMANTIC ROLES - dark (primitive palette inherited) ===== */
+.dark {
+  --background: var(--background-900);
+  --foreground: var(--text-50);
+  --card: var(--background-800);
+  --card-foreground: var(--text-50);
+  --popover: var(--background-700);
+  --popover-foreground: var(--text-50);
+
+  --primary: var(--brand-400);
+  --primary-foreground: var(--background-900);
+  --secondary: var(--background-800);
+  --secondary-foreground: var(--text-50);
+  --muted: var(--background-800);
+  --muted-foreground: var(--text-400);
+  --accent: var(--background-700);
+  --accent-foreground: var(--text-50);
+  --destructive: var(--state-error-dark);
+  --destructive-foreground: var(--state-error-foreground);
+  --success: var(--state-success-dark);
+  --success-foreground: var(--state-success-foreground);
+  --border: var(--background-700);
+  --input: var(--background-700);
+  --ring: var(--brand-400);
+
+  --icon: var(--icon-50);
+  --icon-muted: var(--icon-500);
+
+  --chart-1: var(--state-success-dark);
+  --chart-2: var(--brand-400);
+  --chart-3: #ff9f0a;
+  --chart-4: #5e5ce6;
+  --chart-5: #bf5af2;
+
+  --sidebar: var(--background-800);
+  --sidebar-foreground: var(--text-50);
+  --sidebar-primary: var(--brand-400);
+  --sidebar-primary-foreground: var(--background-900);
+  --sidebar-accent: var(--background-700);
+  --sidebar-accent-foreground: var(--text-50);
+  --sidebar-border: var(--background-700);
+  --sidebar-ring: var(--brand-400);
+
+  --shadow-2xs: 0 1px 2px -1px rgba(0, 0, 0, 0.30);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.30);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.36), 0 1px 3px -1px rgba(0, 0, 0, 0.36);
+  --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.40), 0 1px 2px -1px rgba(0, 0, 0, 0.36);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.44), 0 2px 4px -2px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 8px 24px -8px rgba(0, 0, 0, 0.50), 0 4px 8px -4px rgba(0, 0, 0, 0.40);
+  --shadow-xl: 0 16px 40px -10px rgba(0, 0, 0, 0.55), 0 8px 16px -8px rgba(0, 0, 0, 0.44);
+  --shadow-2xl: 0 24px 64px -12px rgba(0, 0, 0, 0.60);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-foreground: var(--card-foreground);
+  }
+  @layer base {
+    body { background: var(--card-background); color: var(--card-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+  <!-- ===== Sticky Top Navbar (from project-shell.html) ===== -->
+  <nav class="sticky top-0 z-50 w-full" style="height:52px;background:var(--card);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);" aria-label="主导航" data-dom-id="navbar">
+    <div class="mx-auto flex h-full max-w-[1200px] items-center gap-6 px-6">
+
+      <!-- Logo -->
+      <a href="#" class="flex shrink-0 items-center whitespace-nowrap" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--foreground);letter-spacing:-0.01em;" data-dom-id="nav-logo" aria-label="美商培养工具站首页">
+        美商
+      </a>
+
+      <!-- Navigation Links -->
+      <div class="flex items-center gap-1">
+
+        <!-- 立即诊断 — active (current page) -->
+        <a href="#" data-dom-id="nav-diagnosis" data-nav-key="diagnosis" data-active="true"
+           class="inline-flex h-8 shrink-0 items-center whitespace-nowrap rounded-full px-3 text-sm font-semibold transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+           style="color:var(--primary);">
+          立即诊断
+        </a>
+
+        <!-- 审美训练 -->
+        <a href="#" data-dom-id="nav-training" data-nav-key="training"
+           class="inline-flex h-8 shrink-0 items-center whitespace-nowrap rounded-full px-3 text-sm transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+           style="color:var(--foreground);">
+          审美训练
+        </a>
+
+        <!-- 知识库 — disabled, coming soon -->
+        <span data-nav-key="knowledgebase" title="即将上线"
+              class="inline-flex h-8 shrink-0 cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm"
+              style="color:var(--muted-foreground);">
+          知识库
+          <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs leading-tight" style="background:var(--secondary);color:var(--muted-foreground);">即将上线</span>
+        </span>
+
+        <!-- 素材库 — disabled, coming soon -->
+        <span data-nav-key="assetlibrary" title="即将上线"
+              class="inline-flex h-8 shrink-0 cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm"
+              style="color:var(--muted-foreground);">
+          素材库
+          <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs leading-tight" style="background:var(--secondary);color:var(--muted-foreground);">即将上线</span>
+        </span>
+      </div>
+
+      <!-- Right side: User menu -->
+      <div class="ml-auto flex shrink-0 items-center">
+        <button type="button" data-dom-id="nav-profile" data-nav-key="profile"
+                class="inline-flex h-8 items-center gap-1.5 rounded-full pl-1.5 pr-2.5 transition-colors motion-reduce:transition-none hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+                style="color:var(--foreground);"
+                aria-label="个人中心">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full" style="background:var(--secondary);">
+            <span data-icon class="block h-4 w-4" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/user.svg');mask-image:url('../assets/icons/dl_builtin_apple/user.svg');background-color:var(--muted-foreground);"></span>
+          </span>
+          <span data-icon class="block h-3 w-3" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/chevron-down.svg');mask-image:url('../assets/icons/dl_builtin_apple/chevron-down.svg');"></span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ===== Page Content ===== -->
+  <div data-reveal class="mx-auto max-w-[1200px] px-6" style="background:var(--background);">
+
+    <!-- Back button -->
+    <div class="pt-6">
+      <a href="#" data-dom-id="back-index"
+         class="inline-flex items-center gap-1.5 whitespace-nowrap text-sm transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2 rounded"
+         style="color:var(--muted-foreground);">
+        <span data-icon class="block h-4 w-4" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/arrow-left.svg');mask-image:url('../assets/icons/dl_builtin_apple/arrow-left.svg');"></span>
+        返回
+      </a>
+    </div>
+
+    <!-- Page Title -->
+    <div class="py-6">
+      <h1 class="text-3xl font-semibold whitespace-nowrap" style="color:var(--foreground);font-family:var(--font-sans);text-wrap:balance;word-break:keep-all;overflow-wrap:break-word;">AI 设计诊断</h1>
+    </div>
+
+    <!-- Upload Zone -->
+    <div data-reveal class="mx-auto max-w-2xl pb-8">
+      <div class="border-2 border-dashed rounded-[19.2px] p-8 md:p-12 text-center" style="border-color:var(--border);background:var(--card);">
+
+        <!-- Upload Icon -->
+        <div class="flex justify-center mb-5">
+          <i data-lucide="upload-cloud" class="h-12 w-12" style="color:var(--muted-foreground);"></i>
+        </div>
+
+        <!-- Main Text -->
+        <p class="text-lg mb-6" style="color:var(--foreground);">拖拽图片到此处，或</p>
+
+        <!-- Upload Method Buttons -->
+        <div class="flex flex-wrap justify-center gap-3">
+          <button type="button" data-dom-id="upload-file"
+            class="inline-flex h-11 shrink-0 items-center justify-center rounded-full px-5 text-sm font-medium whitespace-nowrap transition-filter hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+            style="background:var(--primary);color:var(--background);">
+            选择文件
+          </button>
+          <button type="button" data-dom-id="upload-url"
+            class="inline-flex h-11 shrink-0 items-center justify-center rounded-full px-5 text-sm font-medium whitespace-nowrap transition-colors hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+            style="border:1px solid var(--border);color:var(--foreground);">
+            粘贴URL
+          </button>
+          <button type="button" data-dom-id="upload-screenshot"
+            class="inline-flex h-11 shrink-0 items-center justify-center rounded-full px-5 text-sm font-medium whitespace-nowrap transition-colors hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-2"
+            style="border:1px solid var(--border);color:var(--foreground);">
+            截图粘贴 Ctrl+V
+          </button>
+        </div>
+
+        <!-- Format Hint -->
+        <p class="mt-6 text-xs" style="color:var(--muted-foreground);">支持 JPG/PNG/WebP，≤10MB</p>
+      </div>
+    </div>
+
+    <!-- Recent Diagnosis History -->
+    <div class="mt-12 pb-16">
+      <h2 class="mb-4 text-base font-semibold whitespace-nowrap" style="color:var(--foreground);">最近诊断</h2>
+      <div data-reveal-stagger class="flex flex-col gap-3">
+
+        <!-- History Item 1 -->
+        <div class="rounded-[19.2px] p-4 flex items-center gap-4" style="border:1px solid var(--border);background:var(--card);">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg" style="background:var(--secondary);">
+            <i data-lucide="image" class="h-5 w-5" style="color:var(--muted-foreground);"></i>
+          </div>
+          <span class="text-sm font-medium truncate min-w-0" style="color:var(--foreground);">海报设计诊断</span>
+          <span class="text-sm whitespace-nowrap shrink-0" style="color:var(--primary);font-family:var(--font-mono);">72分</span>
+          <span class="ml-auto text-xs whitespace-nowrap shrink-0" style="color:var(--muted-foreground);">2小时前</span>
+        </div>
+
+        <!-- History Item 2 -->
+        <div class="rounded-[19.2px] p-4 flex items-center gap-4" style="border:1px solid var(--border);background:var(--card);">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg" style="background:var(--secondary);">
+            <i data-lucide="image" class="h-5 w-5" style="color:var(--muted-foreground);"></i>
+          </div>
+          <span class="text-sm font-medium truncate min-w-0" style="color:var(--foreground);">Banner设计诊断</span>
+          <span class="text-sm whitespace-nowrap shrink-0" style="color:var(--state-success);font-family:var(--font-mono);">85分</span>
+          <span class="ml-auto text-xs whitespace-nowrap shrink-0" style="color:var(--muted-foreground);">昨天</span>
+        </div>
+
+        <!-- History Item 3 -->
+        <div class="rounded-[19.2px] p-4 flex items-center gap-4" style="border:1px solid var(--border);background:var(--card);">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg" style="background:var(--secondary);">
+            <i data-lucide="image" class="h-5 w-5" style="color:var(--muted-foreground);"></i>
+          </div>
+          <span class="text-sm font-medium truncate min-w-0" style="color:var(--foreground);">Logo设计诊断</span>
+          <span class="text-sm whitespace-nowrap shrink-0" style="color:var(--state-error);font-family:var(--font-mono);">68分</span>
+          <span class="ml-auto text-xs whitespace-nowrap shrink-0" style="color:var(--muted-foreground);">3天前</span>
+        </div>
+
+      </div>
+
+      <!-- View All Link -->
+      <a href="#" class="inline-flex items-center gap-1 mt-3 text-sm transition-opacity hover:opacity-70" style="color:var(--primary);">
+        查看全部
+        <span data-icon class="block h-3.5 w-3.5" style="-webkit-mask-image:url('../assets/icons/dl_builtin_apple/chevron-right.svg');mask-image:url('../assets/icons/dl_builtin_apple/chevron-right.svg');"></span>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ===== Footer (from project-shell.html) ===== -->
+  <footer class="w-full" style="background:var(--secondary);border-top:1px solid var(--border);" aria-label="页脚" data-dom-id="footer">
+    <div class="mx-auto max-w-[1200px] px-6" style="padding-top:48px;padding-bottom:48px;">
+      <div class="flex flex-col gap-10">
+
+        <!-- Footer top: brand + link columns -->
+        <div class="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+
+          <!-- Brand block -->
+          <div class="flex flex-col gap-2">
+            <span class="whitespace-nowrap" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--foreground);">美商</span>
+            <p class="max-w-xs text-sm leading-relaxed" style="color:var(--muted-foreground);">AI创作者与开发者的审美培养工具站</p>
+          </div>
+
+          <!-- Link columns -->
+          <nav class="flex flex-wrap gap-x-12 gap-y-6" aria-label="页脚导航">
+            <div class="flex flex-col gap-3">
+              <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">产品</h3>
+              <div class="flex flex-col gap-2">
+                <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">立即诊断</a>
+                <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">审美训练</a>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">资源</h3>
+              <div class="flex flex-col gap-2">
+                <span class="whitespace-nowrap text-sm" style="color:var(--muted-foreground);opacity:0.6;">知识库即将上线</span>
+                <span class="whitespace-nowrap text-sm" style="color:var(--muted-foreground);opacity:0.6;">素材库即将上线</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <h3 class="whitespace-nowrap text-xs font-semibold" style="color:var(--foreground);">账户</h3>
+              <div class="flex flex-col gap-2">
+                <a href="#" class="whitespace-nowrap text-sm transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">个人中心</a>
+              </div>
+            </div>
+          </nav>
+
+        </div>
+
+        <!-- Footer bottom: copyright + legal links -->
+        <div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center md:justify-between" style="border-top:1px solid var(--border);">
+          <span class="whitespace-nowrap text-xs" style="color:var(--muted-foreground);">© 2026 美商培养工具站</span>
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">隐私政策</a>
+            <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">服务条款</a>
+            <a href="#" class="whitespace-nowrap text-xs transition-colors motion-reduce:transition-none hover:opacity-70" style="color:var(--muted-foreground);">联系我们</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </footer>
+
+    </main>
+    <style>
+      /* ===== Blue Gradient Theme + Glassmorphism + Scroll Reveal ===== */
+      body {
+        --foreground: #0891b2;
+        --muted-foreground: #0e7490;
+        --border: rgba(8, 145, 178, 0.2);
+        --secondary: rgba(8, 145, 178, 0.08);
+        --card: rgba(255, 255, 255, 0.6);
+        background: linear-gradient(180deg, #a5d5ff 0%, #c0e3ff 15%, #d8eefa 30%, #e8f3fc 50%, #f2f8fd 70%, #f9fbfe 85%, #ffffff 100%);
+        min-height: 100vh;
+        font-family: 'Playfair Display', 'Times New Roman', Georgia, serif !important;
+      }
+      *, h1, h2, h3, h4, h5, h6, p, span, a, button, li, div, input, label {
+        font-family: 'Playfair Display', 'Times New Roman', Georgia, serif !important;
+      }
+      h1 { font-weight: 700 !important; letter-spacing: -0.02em; }
+      h2 { font-weight: 700 !important; letter-spacing: -0.01em; }
+      h3 { font-weight: 600 !important; }
+      p, li { font-weight: 400; line-height: 1.6; }
+
+      /* Frosted Glass for all cards */
+      [class*="rounded-"][class*="border"],
+      [class*="rounded-"][style*="border"],
+      [class*="rounded-"][style*="background:var(--card)"],
+      [class*="rounded-"][style*="background:var(--secondary)"] {
+        background: rgba(255, 255, 255, 0.55) !important;
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.45) !important;
+        box-shadow: 0 8px 32px -8px rgba(8, 145, 178, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+      }
+      [class*="rounded-"][class*="border-2"] {
+        background: rgba(255, 255, 255, 0.65) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+        box-shadow: 0 8px 32px -8px rgba(8, 145, 178, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+      }
+
+      /* Glass buttons */
+      a[style*="background:var(--foreground)"],
+      button[style*="background:var(--foreground)"],
+      a[style*="background:var(--primary)"],
+      button[style*="background:var(--primary)"] {
+        background: rgba(8, 145, 178, 0.75) !important;
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 4px 16px -4px rgba(8, 145, 178, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+      }
+
+      /* Frosted nav */
+      .frosted-nav, nav[style*="backdrop-filter"], nav[style*="saturate"] {
+        background: rgba(255, 255, 255, 0.55) !important;
+        backdrop-filter: saturate(180%) blur(20px) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+      }
+
+      /* Footer transparent */
+      footer { background: transparent !important; }
+
+      /* Scroll Reveal */
+      [data-reveal] {
+        opacity: 0; transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.32, 0.72, 0, 1), transform 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+        will-change: opacity, transform;
+      }
+      [data-reveal].revealed { opacity: 1; transform: translateY(0); }
+      [data-reveal-stagger] > * {
+        opacity: 0; transform: translateY(30px);
+        transition: opacity 0.7s cubic-bezier(0.32, 0.72, 0, 1), transform 0.7s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+      [data-reveal-stagger].revealed > * { opacity: 1; transform: translateY(0); }
+      [data-reveal-stagger].revealed > *:nth-child(1) { transition-delay: 0ms; }
+      [data-reveal-stagger].revealed > *:nth-child(2) { transition-delay: 100ms; }
+      [data-reveal-stagger].revealed > *:nth-child(3) { transition-delay: 200ms; }
+      [data-reveal-stagger].revealed > *:nth-child(4) { transition-delay: 300ms; }
+      [data-reveal-stagger].revealed > *:nth-child(5) { transition-delay: 400ms; }
+
+      /* Smooth page transitions */
+      html { scroll-behavior: smooth; }
+      /* body transition handled by main animation */
+
+      .countup { display: inline-block; }
+
+      @media (prefers-reduced-motion: reduce) {
+        [data-reveal], [data-reveal-stagger] > * { opacity: 1 !important; transform: none !important; transition: none !important; }
+        body { animation: none !important; }
+      }
+
+      /* ===== Nav item glass texture (Apple frosted pill) ===== */
+      nav.sticky a[class*="rounded-full"],
+      nav.sticky span[class*="rounded-full"] {
+        background: rgba(255, 255, 255, 0.2) !important;
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35) !important;
+        transition: background 0.3s ease, box-shadow 0.3s ease !important;
+      }
+      nav.sticky a[class*="rounded-full"]:hover,
+      nav.sticky span[class*="rounded-full"]:hover {
+        background: rgba(255, 255, 255, 0.38) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 0 2px 8px -2px rgba(8, 145, 178, 0.15) !important;
+      }
+      nav.sticky a[style*="color:var(--primary)"],
+      nav.sticky a[data-active="true"] {
+        background: rgba(8, 145, 178, 0.15) !important;
+        border: 1px solid rgba(8, 145, 178, 0.25) !important;
+      }
+
+      /* ===== Enhanced Siri-style glass for all cards ===== */
+      [class*="rounded-"][class*="border"],
+      [class*="rounded-"][style*="border"],
+      [class*="rounded-"][style*="background:var(--card)"],
+      [class*="rounded-"][style*="background:var(--secondary)"] {
+        background: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(32px) saturate(200%);
+        -webkit-backdrop-filter: blur(32px) saturate(200%);
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 12px 40px -8px rgba(8, 145, 178, 0.18),
+                    0 4px 12px -4px rgba(8, 145, 178, 0.1),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+      }
+
+      /* ===== Page transition (smooth fade-up, GPU-accelerated) ===== */
+      main {
+        animation: pageSlideIn 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+        will-change: opacity, transform;
+      }
+      @keyframes pageSlideIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* ===== Nav sliding indicator ===== */
+      .nav-links-wrap { position: relative; }
+      .nav-slider {
+        position: absolute;
+        height: 32px;
+        border-radius: 9999px;
+        background: rgba(8, 145, 178, 0.12);
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border: 1px solid rgba(8, 145, 178, 0.2);
+        transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1), width 0.45s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+        z-index: 0;
+        pointer-events: none;
+        top: 50%;
+        left: 0;
+        opacity: 0;
+      }
+    </style>
+    <script>
+      lucide.createIcons();
+      (function () {
+        var els = document.querySelectorAll('[data-reveal], [data-reveal-stagger]');
+        if (!els.length) return;
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('revealed'); observer.unobserve(entry.target); }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+        els.forEach(function (el) { observer.observe(el); });
+      })();
+
+      // ===== CountUp =====
+      (function () {
+        var countEls = document.querySelectorAll('.countup');
+        if (!countEls.length) return;
+        function animateCount(el) {
+          var to = parseFloat(el.getAttribute('data-to')) || 0;
+          var duration = parseFloat(el.getAttribute('data-duration')) || 2;
+          var start = 0; var startTime = null;
+          function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+          function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+            var eased = easeOutExpo(progress);
+            el.textContent = Math.round(start + (to - start) * eased);
+            if (progress < 1) requestAnimationFrame(step);
+            else el.textContent = to;
+          }
+          requestAnimationFrame(step);
+        }
+        var countObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) { setTimeout(function () { animateCount(entry.target); }, 300); countObserver.unobserve(entry.target); }
+          });
+        }, { threshold: 0.3 });
+        countEls.forEach(function (el) { countObserver.observe(el); });
+      })();
+
+      // ===== Nav sliding indicator =====
+      (function () {
+        var navWrap = document.querySelector('nav.sticky .flex.items-center.gap-1');
+        if (!navWrap) return;
+        navWrap.classList.add('nav-links-wrap');
+        var slider = document.createElement('div');
+        slider.className = 'nav-slider';
+        navWrap.insertBefore(slider, navWrap.firstChild);
+
+        var items = navWrap.querySelectorAll('a[data-nav-key], span[data-nav-key]');
+        function findActive() {
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].getAttribute('data-active') === 'true' ||
+                (items[i].style && items[i].style.color === 'var(--primary)')) {
+              return items[i];
+            }
+          }
+          return null;
+        }
+
+        function moveSlider(item) {
+          if (!item) { slider.style.opacity = '0'; return; }
+          var r = item.getBoundingClientRect();
+          var cr = navWrap.getBoundingClientRect();
+          slider.style.width = r.width + 'px';
+          slider.style.transform = 'translateY(-50%) translateX(' + (r.left - cr.left) + 'px)';
+          slider.style.opacity = '1';
+        }
+
+        var active = findActive();
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { moveSlider(active); });
+        });
+        window.addEventListener('resize', function () { moveSlider(findActive()); });
+
+        items.forEach(function (item) {
+          item.addEventListener('click', function (e) {
+            if (item.classList.contains('cursor-not-allowed')) return;
+            e.preventDefault();
+            moveSlider(item);
+          });
+        });
+      })();
+    </script>
+</body>
+</html>

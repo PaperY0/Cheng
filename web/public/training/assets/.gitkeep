@@ -1,0 +1,5 @@
+# 此目录用于存放审美训练的本地图片素材
+# 图片命名规则：{questionId}-{optionId}.png
+# 例如：contrast-001-a.png, contrast-001-b.png
+# 每道题需要两张图片（A 为不够好的设计，B 为更好的设计）
+# 图片将在后续步骤中补充
