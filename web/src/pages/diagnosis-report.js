@@ -354,6 +354,7 @@ async function submitPreviewTask(task, issueId, prompt, model) {
 
   const res = await fetch('/api/generate-preview', { method: 'POST', body: formData });
   const data = await readJsonResponse(res);
+  if (res.ok && data?.status === 'success' && data?.image?.url) return data;
   if (res.status !== 202 || data?.status !== 'processing' || !data?.jobId) {
     throw new Error(mapErrorMessage(res.status, data));
   }
@@ -398,14 +399,16 @@ async function generatePreview(issueId, prompt) {
   try {
     let submitted = await submitPreviewTask(task, issueId, prompt);
     let data;
-    try {
+    if (submitted.status === 'success') {
+      data = submitted;
+    } else try {
       data = await pollPreviewTask(submitted.jobId);
     } catch (primaryError) {
       // 主模型任务明确失败或等待过久时，仅重提一次配置好的 image2 备用模型。
       // 不把错误直接抛给用户，也不在同一 HTTP 请求内等待备用模型。
       const fallbackModel = submitted.fallbackModel || 'qwen-image-2.0';
       submitted = await submitPreviewTask(task, issueId, prompt, fallbackModel);
-      data = await pollPreviewTask(submitted.jobId);
+      data = submitted.status === 'success' ? submitted : await pollPreviewTask(submitted.jobId);
     }
 
     // 成功：写回 taskStore（持久化）+ 清除临时态

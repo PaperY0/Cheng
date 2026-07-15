@@ -356,7 +356,7 @@ export async function generateImageWithQwenImage({ imageBuffer, imageMimeType, p
  * 提交异步生图任务。这里只等待 DashScope 接收任务（通常很快返回 taskId），
  * 不等待模型出图，避免 Render 长连接被代理层中断。
  */
-export async function submitImageGenerationTask({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride }) {
+export async function submitImageGenerationTask({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride, timeoutOverride }) {
   const config = getImageConfig();
   const { apiKey, baseUrl, styleProfile, referenceImages } = config;
   const model = modelOverride || config.model;
@@ -367,7 +367,7 @@ export async function submitImageGenerationTask({ imageBuffer, imageMimeType, pr
   const controller = new AbortController();
   // 提交阶段只等待平台接收 base64 图片并创建任务；不等待出图。
   // Render 冷启动和较大截图上传偶尔会超过 20 秒，因此保留 60 秒余量。
-  const timeoutMs = Number(process.env.QWEN_IMAGE_SUBMIT_TIMEOUT_MS) || 60000;
+  const timeoutMs = timeoutOverride || Number(process.env.QWEN_IMAGE_SUBMIT_TIMEOUT_MS) || 60000;
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   const startTime = Date.now();
 

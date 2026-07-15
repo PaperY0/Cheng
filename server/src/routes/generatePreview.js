@@ -26,7 +26,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { ApiError } from '../middleware/errorHandler.js';
-import { submitImageGenerationTask, queryImageGenerationTask, IMAGE_GEN_ERRORS } from '../providers/qwenImage.js';
+import { submitImageGenerationTask, queryImageGenerationTask, generateImageWithQwenImage, IMAGE_GEN_ERRORS } from '../providers/qwenImage.js';
 
 const router = Router();
 
@@ -152,14 +152,49 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     }
 
     const modelOverride = getAllowedModelOverride(requestedModel);
-    const result = await submitImageGenerationTask({
-      imageBuffer: file.buffer,
-      imageMimeType: file.mimetype,
-      prompt,
-      designType,
-      goal: goal || '',
-      modelOverride,
-    });
+    const primaryModel = modelOverride || String(process.env.QWEN_IMAGE_MODEL || 'wan2.6-image').trim();
+    const fallbackModel = String(process.env.QWEN_IMAGE_FALLBACK_MODEL || 'qwen-image-2.0').trim();
+    let result;
+    try {
+      result = await submitImageGenerationTask({
+        imageBuffer: file.buffer,
+        imageMimeType: file.mimetype,
+        prompt,
+        designType,
+        goal: goal || '',
+        modelOverride,
+        // 万相 2.6 在 Render 未返回 taskId 时不值得让用户继续等待；
+        // 接下来切换到已验证更快的 image2 同步降级模型。
+        timeoutOverride: primaryModel === 'wan2.6-image'
+          ? Number(process.env.QWEN_IMAGE_PRIMARY_SUBMIT_TIMEOUT_MS) || 15000
+          : undefined,
+      });
+    } catch (primaryError) {
+      const canFallback = primaryError?.code === IMAGE_GEN_ERRORS.TIMEOUT
+        && primaryModel === 'wan2.6-image'
+        && fallbackModel
+        && fallbackModel !== primaryModel;
+      if (!canFallback) throw primaryError;
+
+      console.log('[generate-preview] 万相任务提交超时，切换 image2', { taskId, issueId, primaryModel, fallbackModel });
+      const fallbackResult = await generateImageWithQwenImage({
+        imageBuffer: file.buffer,
+        imageMimeType: file.mimetype,
+        prompt,
+        designType,
+        goal: goal || '',
+        modelOverride: fallbackModel,
+        timeoutOverride: Number(process.env.QWEN_IMAGE_FALLBACK_TIMEOUT_MS) || 45000,
+      });
+      return res.json({
+        taskId,
+        issueId,
+        status: 'success',
+        provider: fallbackResult.model,
+        fallback: true,
+        image: { url: fallbackResult.url, expiresAt: fallbackResult.expiresAt ?? null },
+      });
+    }
 
     const elapsed = Date.now() - routeStart;
     // 业务日志（不记录 API Key、请求体、图片数据）
@@ -177,7 +212,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       status: 'processing',
       provider: result.model,
       jobId: result.jobId,
-      fallbackModel: String(process.env.QWEN_IMAGE_FALLBACK_MODEL || 'qwen-image-2.0').trim(),
+      fallbackModel,
       pollAfterMs: 5000,
     });
   } catch (err) {
