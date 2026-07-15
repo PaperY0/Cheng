@@ -112,7 +112,7 @@ function legacyDiagnosisRecords() {
     id: `diagnosis-${item.taskId || item.generatedAt}`,
     type: 'diagnosis', title: item.name || 'AI 设计诊断', score: item.score,
     createdAt: item.generatedAt, summary: item.provider === 'mock' ? 'Mock 诊断结果' : '通义千问 VL 诊断结果',
-    meta: { scores: item.report?.scores || {}, provider: item.provider, reportId: item.report?.reportId },
+    meta: { scores: item.report?.scores || {}, provider: item.provider, reportId: item.report?.reportId, designType: item.designType },
     route: item.taskId ? `/diagnosis/${item.taskId}/report` : '',
   }, 'diagnosis'));
 }

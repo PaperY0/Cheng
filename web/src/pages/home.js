@@ -1,9 +1,9 @@
 // 首页 - 迁移自 meishang-tool-station/pages/index.html
 // 保留全部视觉结构，CTA 和导航改为真实路由
-import { getRecentDiagnoses } from '../taskStore.js';
+import { getHistoryByType } from '../profileStore.js';
 
 export function renderHome() {
-  const recent = getRecentDiagnoses();
+  const recent = getHistoryByType('diagnosis').slice(0, 3);
   return `
   <!-- Hero -->
   <section class="relative flex min-h-[78vh] flex-col items-center justify-center px-6 text-center" style="padding-top:96px;padding-bottom:48px;">
@@ -30,12 +30,16 @@ export function renderHome() {
       <a href="/history" data-link="/history" class="text-sm" style="color:var(--foreground);font-weight:600;">查看全部</a>
     </div>
     <div class="flex flex-col gap-3">
-      ${recent.slice(0, 3).map((item) => `
-      <a href="/diagnosis/${encodeURIComponent(item.taskId)}/report" data-link="/diagnosis/${encodeURIComponent(item.taskId)}/report" data-reveal class="flex items-center gap-4 rounded-[20px] border p-4 transition-transform hover:scale-[1.01]" style="border-color:var(--border);background:var(--card);">
+      ${recent.map((item) => {
+        const route = item.route || '/history';
+        const designType = item.meta?.designType;
+        return `
+      <a href="${escapeHtml(route)}" data-link="${escapeHtml(route)}" data-reveal class="flex items-center gap-4 rounded-[20px] border p-4 transition-transform hover:scale-[1.01]" style="border-color:var(--border);background:var(--card);">
         <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]" style="background:var(--secondary);"><i data-lucide="image" class="w-5 h-5" style="color:var(--foreground);"></i></span>
-        <span class="min-w-0 flex-1"><span class="block truncate text-sm" style="color:var(--foreground);font-weight:600;">${escapeHtml(item.name)}</span><span class="mt-1 block text-xs" style="color:var(--muted-foreground);">${item.designType === 'graphic' ? '平面设计' : '界面设计'} · ${formatRecentTime(item.generatedAt)}</span></span>
+        <span class="min-w-0 flex-1"><span class="block truncate text-sm" style="color:var(--foreground);font-weight:600;">${escapeHtml(item.title)}</span><span class="mt-1 block text-xs" style="color:var(--muted-foreground);">${designType === 'graphic' ? '平面设计' : '界面设计'} · ${formatRecentTime(item.createdAt)}</span></span>
         <span class="text-lg" style="color:${item.score >= 80 ? '#34c759' : item.score >= 60 ? '#ff9500' : '#ff3b30'};font-weight:700;">${item.score}分</span>
-      </a>`).join('')}
+      </a>`;
+      }).join('')}
     </div>
   </section>` : ''}
 

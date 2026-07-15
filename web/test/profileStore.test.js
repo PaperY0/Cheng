@@ -24,6 +24,7 @@ class MemoryStorage {
 globalThis.localStorage = new MemoryStorage();
 
 const { getAllHistory, clearHistory, deleteHistoryRecord } = await import('../src/profileStore.js');
+const { renderHome } = await import('../src/pages/home.js');
 
 function setRecentDiagnoses(records) {
   localStorage.setItem('meishang.recentDiagnoses', JSON.stringify(records));
@@ -47,6 +48,7 @@ test('清空历史后，旧的诊断来源记录不会被自动重新导入', ()
   assert.equal(getAllHistory().length, 1);
   assert.equal(clearHistory(), true);
   assert.equal(getAllHistory().length, 0);
+  assert.doesNotMatch(renderHome(), /old-task\.png/);
 
   setRecentDiagnoses([
     diagnosis('future-task', new Date(Date.now() + 60_000).toISOString()),
