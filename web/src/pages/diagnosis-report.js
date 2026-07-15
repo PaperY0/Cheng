@@ -383,9 +383,9 @@ async function generatePreview(issueId, prompt) {
 // 错误消息映射（按 HTTP 状态码和错误码返回对应中文）
 function mapErrorMessage(status, data) {
   const msg = data?.error?.message || '';
-  // API key / 配置错误
-  if (status === 500 && /API Key|Key|配置/i.test(msg)) {
-    return '生图服务配置错误，请检查服务端 Key';
+  // 配置错误：保留服务端给出的安全中文说明，避免把「缺端点」误导成 Key 失效。
+  if (status === 500 && /API Key|Key|配置|未设置|未配置/i.test(msg)) {
+    return msg || '生图服务配置错误，请检查服务端环境变量';
   }
   // 超时
   if (status === 504) {
