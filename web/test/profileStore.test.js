@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 class MemoryStorage {
   #data = new Map();
@@ -66,4 +67,10 @@ test('删除历史后，来源记录不会在下一次读取时重新出现', ()
   assert.equal(getAllHistory().length, 1);
   assert.equal(deleteHistoryRecord('diagnosis-deleted-task'), true);
   assert.equal(getAllHistory().length, 0);
+});
+
+test('新建诊断页的最近诊断使用统一历史层', async () => {
+  const source = await readFile(new URL('../src/pages/diagnosis-new.js', import.meta.url), 'utf8');
+  assert.match(source, /getHistoryByType\('diagnosis'\)/);
+  assert.doesNotMatch(source, /getRecentDiagnoses/);
 });

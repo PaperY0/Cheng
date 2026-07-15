@@ -1,9 +1,10 @@
 // 新建诊断页 - 图片上传与校验 + 诊断配置表单 + 本地任务创建
 // 状态仅在模块内存中保存，刷新即重置
 
-import { setTask, generateTaskId, getRecentDiagnoses } from '../taskStore.js';
+import { setTask, generateTaskId } from '../taskStore.js';
 import { navigate } from '../router.js';
 import { revealElements } from '../reveal.js';
+import { getHistoryByType } from '../profileStore.js';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -247,7 +248,7 @@ function renderContent() {
 
 // 空闲态：上传区
 function renderIdle() {
-  const recent = getRecentDiagnoses();
+  const recent = getHistoryByType('diagnosis').slice(0, 3);
   return `
   <div data-reveal class="rounded-[28px] border p-8 md:p-12 text-center" style="border-color:var(--border);background:var(--card);">
     <span class="flex h-16 w-16 mx-auto items-center justify-center rounded-full" style="background:var(--secondary);">
@@ -272,12 +273,16 @@ function renderIdle() {
       <a href="/history" data-link="/history" class="text-xs" style="color:var(--foreground);font-weight:600;">查看全部</a>
     </div>
     <div class="flex flex-col gap-3">
-      ${recent.slice(0, 3).map((item) => `
-      <a href="/diagnosis/${encodeURIComponent(item.taskId)}/report" data-link="/diagnosis/${encodeURIComponent(item.taskId)}/report" class="flex items-center gap-4 rounded-[20px] border p-4" style="border-color:var(--border);background:var(--card);">
+      ${recent.map((item) => {
+        const route = item.route || '/history';
+        const designType = item.meta?.designType;
+        return `
+      <a href="${escapeHtml(route)}" data-link="${escapeHtml(route)}" class="flex items-center gap-4 rounded-[20px] border p-4" style="border-color:var(--border);background:var(--card);">
         <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]" style="background:var(--secondary);"><i data-lucide="image" class="w-5 h-5" style="color:var(--foreground);"></i></span>
-        <span class="min-w-0 flex-1"><span class="block truncate text-sm" style="color:var(--foreground);font-weight:600;">${escapeHtml(item.name)}</span><span class="mt-1 block text-xs" style="color:var(--muted-foreground);">${item.designType === 'graphic' ? '平面设计' : '界面设计'} · ${formatRecentTime(item.generatedAt)}</span></span>
+        <span class="min-w-0 flex-1"><span class="block truncate text-sm" style="color:var(--foreground);font-weight:600;">${escapeHtml(item.title)}</span><span class="mt-1 block text-xs" style="color:var(--muted-foreground);">${designType === 'graphic' ? '平面设计' : '界面设计'} · ${formatRecentTime(item.createdAt)}</span></span>
         <span style="color:${item.score >= 80 ? '#34c759' : item.score >= 60 ? '#ff9500' : '#ff3b30'};font-weight:700;">${item.score}分</span>
-      </a>`).join('')}
+      </a>`;
+      }).join('')}
     </div>
   </section>` : ''}`;
 }
