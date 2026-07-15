@@ -11,9 +11,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "tailwindcss": "^3.4.17",
     "vite": "^4.5.5"
-  },
-  "devDependencies": {
-    "tailwindcss": "^3.4.17"
   }
 }
