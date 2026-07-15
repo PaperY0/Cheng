@@ -3,7 +3,9 @@
 //
 // 配置隔离原则：
 // - 诊断使用 DASHSCOPE_BASE_URL + DASHSCOPE_MODEL（qwen3-vl-flash），走 OpenAI 兼容 /chat/completions
-// - 生图使用 QWEN_IMAGE_BASE_URL + QWEN_IMAGE_MODEL（wan2.6-image / qwen-image-2.0），走 DashScope 原生 /api/v1/services/aigc/multimodal-generation/generation
+// - 生图使用 QWEN_IMAGE_BASE_URL + QWEN_IMAGE_MODEL（wan2.6-image / qwen-image-2.0）。
+//   万相 2.6 的编辑任务耗时不稳定，生产环境使用 DashScope 异步任务接口，
+//   避免浏览器、Render 与模型之间维持长连接而超时。
 // - 两者不允许共用模型配置和端点
 // - API Key 只读取服务端 DASHSCOPE_API_KEY，禁止返回给前端
 // - 禁止把图片写入磁盘
@@ -21,6 +23,7 @@ export const IMAGE_GEN_ERRORS = {
 
 // DashScope 原生生图端点路径（与诊断的 OpenAI 兼容端点 /chat/completions 完全不同）
 const IMAGE_GENERATION_PATH = '/api/v1/services/aigc/multimodal-generation/generation';
+const ASYNC_IMAGE_GENERATION_PATH = '/api/v1/services/aigc/image-generation/generation';
 
 // 读取并清理 API Key（仅服务端环境变量，不进响应、不进日志）
 function getApiKey() {
@@ -148,6 +151,58 @@ function extractImageUrl(data) {
   return null;
 }
 
+function extractTaskId(data) {
+  const taskId = data?.output?.task_id || data?.output?.taskId || data?.task_id || data?.taskId;
+  return typeof taskId === 'string' && taskId.trim() ? taskId.trim() : null;
+}
+
+function getTaskStatus(data) {
+  return String(data?.output?.task_status || data?.output?.taskStatus || data?.task_status || '').toUpperCase();
+}
+
+function buildGenerationBody({ imageBuffer, imageMimeType, prompt, designType, goal, model, styleProfile, referenceImages, asyncMode = false }) {
+  const dataUrl = bufferToDataUrl(imageBuffer, imageMimeType);
+  const editPrompt = buildEditPrompt(prompt, designType, goal, styleProfile, referenceImages.length > 0);
+  const imageMessages = [
+    { image: dataUrl },
+    ...referenceImages.map((url) => ({ image: url })),
+    { text: editPrompt },
+  ];
+
+  return {
+    model,
+    input: { messages: [{ role: 'user', content: imageMessages }] },
+    parameters: {
+      ...(asyncMode ? { max_images: 1 } : { n: 1 }),
+      watermark: false,
+      prompt_extend: false,
+      negative_prompt: '重新设计整张页面，改变布局，改变画布比例，替换原有文字，中文乱码，英文乱码，新增无关图标，新增云朵上传图标，新增装饰插画，删除原有内容，低清晰度，模糊，畸变，重复元素，错误拼写',
+      ...(model === 'wan2.6-image' ? { enable_interleave: false, size: '2K' } : {}),
+    },
+  };
+}
+
+function validateImageRequest({ imageBuffer, imageMimeType, prompt, model, apiKey, baseUrl }) {
+  if (!Buffer.isBuffer(imageBuffer) || imageBuffer.length === 0) {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'imageBuffer 缺失或为空', 400);
+  }
+  if (!imageMimeType || typeof imageMimeType !== 'string') {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'imageMimeType 缺失', 400);
+  }
+  if (!prompt || typeof prompt !== 'string') {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'prompt 缺失', 400);
+  }
+  if (!apiKey) {
+    throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '未配置 DASHSCOPE_API_KEY，请在 server/.env 中设置', 500);
+  }
+  if (!baseUrl) {
+    throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '未配置 QWEN_IMAGE_BASE_URL，生图接口需要独立的 base url', 500);
+  }
+  if (String(model).startsWith('qwen3-vl')) {
+    throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '生图接口必须使用 qwen-image 系列模型，不能复用 qwen3-vl 诊断模型', 500);
+  }
+}
+
 // 从错误响应中判断是否为 API Key 问题
 function isApiKeyError(status, errData) {
   if (status === 401 || status === 403) return true;
@@ -175,79 +230,15 @@ function isApiKeyError(status, errData) {
  * 禁止：写磁盘、返回 API Key、伪造 URL、返回诊断 JSON
  */
 export async function generateImageWithQwenImage({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride, timeoutOverride }) {
-  // 防御性校验：入参完整性（路由层已校验，provider 再防御一次）
-  if (!Buffer.isBuffer(imageBuffer) || imageBuffer.length === 0) {
-    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'imageBuffer 缺失或为空', 400);
-  }
-  if (!imageMimeType || typeof imageMimeType !== 'string') {
-    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'imageMimeType 缺失', 400);
-  }
-  if (!prompt || typeof prompt !== 'string') {
-    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, 'prompt 缺失', 400);
-  }
-
   const config = getImageConfig();
   const { apiKey, baseUrl, styleProfile, referenceImages } = config;
   const model = modelOverride || config.model;
   const timeoutMs = timeoutOverride || config.timeoutMs;
 
-  // 配置校验：API Key 必填
-  if (!apiKey) {
-    throw new ApiError(
-      IMAGE_GEN_ERRORS.CONFIG_ERROR,
-      '未配置 DASHSCOPE_API_KEY，请在 server/.env 中设置',
-      500
-    );
-  }
-
-  // 配置校验：生图 base url 必填（与诊断 base url 隔离）
-  if (!baseUrl) {
-    throw new ApiError(
-      IMAGE_GEN_ERRORS.CONFIG_ERROR,
-      '未配置 QWEN_IMAGE_BASE_URL，生图接口需要独立的 base url',
-      500
-    );
-  }
-
-  // 配置校验：生图模型不允许混用诊断模型
-  if (String(model).startsWith('qwen3-vl')) {
-    throw new ApiError(
-      IMAGE_GEN_ERRORS.CONFIG_ERROR,
-      '生图接口必须使用 qwen-image 系列模型，不能复用 qwen3-vl 诊断模型',
-      500
-    );
-  }
+  validateImageRequest({ imageBuffer, imageMimeType, prompt, model, apiKey, baseUrl });
 
   // 构建请求体：DashScope 原生 multimodal-generation 格式
-  const dataUrl = bufferToDataUrl(imageBuffer, imageMimeType);
-  const editPrompt = buildEditPrompt(prompt, designType, goal, styleProfile, referenceImages.length > 0);
-
-  const imageMessages = [
-    { image: dataUrl },
-    ...referenceImages.map((url) => ({ image: url })),
-    { text: editPrompt },
-  ];
-
-  const body = {
-    model,
-    input: {
-      messages: [
-        {
-          role: 'user',
-          content: imageMessages,
-        },
-      ],
-    },
-    parameters: {
-      n: 1,
-      watermark: false,
-      prompt_extend: false,
-      negative_prompt: '重新设计整张页面，改变布局，改变画布比例，替换原有文字，中文乱码，英文乱码，新增无关图标，新增云朵上传图标，新增装饰插画，删除原有内容，低清晰度，模糊，畸变，重复元素，错误拼写',
-      ...(model === 'wan2.6-image'
-        ? { enable_interleave: false, size: '2K' }
-        : {}),
-    },
-  };
+  const body = buildGenerationBody({ imageBuffer, imageMimeType, prompt, designType, goal, model, styleProfile, referenceImages });
 
   const url = `${baseUrl.replace(/\/+$/, '')}${IMAGE_GENERATION_PATH}`;
   const startTime = Date.now();
@@ -359,4 +350,95 @@ export async function generateImageWithQwenImage({ imageBuffer, imageMimeType, p
     requestId,
     model,
   };
+}
+
+/**
+ * 提交异步生图任务。这里只等待 DashScope 接收任务（通常很快返回 taskId），
+ * 不等待模型出图，避免 Render 长连接被代理层中断。
+ */
+export async function submitImageGenerationTask({ imageBuffer, imageMimeType, prompt, designType, goal, modelOverride }) {
+  const config = getImageConfig();
+  const { apiKey, baseUrl, styleProfile, referenceImages } = config;
+  const model = modelOverride || config.model;
+  validateImageRequest({ imageBuffer, imageMimeType, prompt, model, apiKey, baseUrl });
+
+  const url = `${baseUrl.replace(/\/+$/, '')}${ASYNC_IMAGE_GENERATION_PATH}`;
+  const body = buildGenerationBody({ imageBuffer, imageMimeType, prompt, designType, goal, model, styleProfile, referenceImages, asyncMode: true });
+  const controller = new AbortController();
+  const timeoutMs = Number(process.env.QWEN_IMAGE_SUBMIT_TIMEOUT_MS) || 20000;
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const startTime = Date.now();
+
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'X-DashScope-Async': 'enable' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    const elapsed = Date.now() - startTime;
+    if (err.name === 'AbortError') {
+      throw new ApiError(IMAGE_GEN_ERRORS.TIMEOUT, `生图任务提交超时（${Math.round(timeoutMs / 1000)}秒）`, 504);
+    }
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, `生图服务网络错误: ${err.message}`, 502);
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  let data;
+  try { data = await res.json(); } catch (_) {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, `生图服务返回 HTTP ${res.status}，响应非 JSON`, 502);
+  }
+  const requestId = data?.request_id || data?.requestId || null;
+  if (!res.ok || (data?.code && data?.message)) {
+    if (isApiKeyError(res.status, data)) throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '通义千问 API Key 无效或已被撤销，请检查服务端配置', 500);
+    if (res.status === 429) throw new ApiError(IMAGE_GEN_ERRORS.RATE_LIMITED, '生图服务请求过于频繁，请稍后重试', 429);
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, data?.message || `生图任务提交失败（HTTP ${res.status}）`, 502);
+  }
+  const jobId = extractTaskId(data);
+  if (!jobId) throw new ApiError(IMAGE_GEN_ERRORS.OUTPUT_INVALID, '生图服务未返回任务 ID', 502);
+
+  console.log('[qwen-image] 异步任务已提交', { model, requestId, elapsed: Date.now() - startTime });
+  return { jobId, requestId, model };
+}
+
+/** 查询异步任务；任务完成后才返回图片 URL。 */
+export async function queryImageGenerationTask(jobId) {
+  if (!jobId || typeof jobId !== 'string' || jobId.length > 200) {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, '生图任务 ID 非法', 400);
+  }
+  const { apiKey, baseUrl } = getImageConfig();
+  if (!apiKey || !baseUrl) throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '生图服务配置不完整，请检查服务端环境变量', 500);
+
+  let res;
+  try {
+    res = await fetch(`${baseUrl.replace(/\/+$/, '')}/api/v1/tasks/${encodeURIComponent(jobId)}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch (err) {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, `查询生图任务失败: ${err.message}`, 502);
+  }
+  let data;
+  try { data = await res.json(); } catch (_) {
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, `查询生图任务返回 HTTP ${res.status}，响应非 JSON`, 502);
+  }
+  if (!res.ok || (data?.code && data?.message && !data?.output)) {
+    if (isApiKeyError(res.status, data)) throw new ApiError(IMAGE_GEN_ERRORS.CONFIG_ERROR, '通义千问 API Key 无效或已被撤销，请检查服务端配置', 500);
+    throw new ApiError(IMAGE_GEN_ERRORS.PROVIDER_ERROR, data?.message || `查询生图任务失败（HTTP ${res.status}）`, 502);
+  }
+
+  const providerStatus = getTaskStatus(data);
+  const requestId = data?.request_id || data?.requestId || null;
+  if (providerStatus === 'PENDING' || providerStatus === 'RUNNING') {
+    return { status: 'processing', jobId, requestId, providerStatus };
+  }
+  if (providerStatus === 'SUCCEEDED') {
+    const url = extractImageUrl(data);
+    if (!url) throw new ApiError(IMAGE_GEN_ERRORS.OUTPUT_INVALID, '生图任务完成但未返回图片 URL', 502);
+    return { status: 'success', jobId, requestId, url, expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+  }
+  const failure = data?.output?.message || data?.message || '生图任务未完成';
+  return { status: 'failed', jobId, requestId, providerStatus: providerStatus || 'UNKNOWN', message: failure };
 }

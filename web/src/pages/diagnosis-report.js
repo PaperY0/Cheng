@@ -326,7 +326,55 @@ function updateIssueGenButton(issueId) {
   bindIssueGenButton(container, issueId);
 }
 
-// 调用 POST /api/generate-preview 生成效果图
+const PREVIEW_POLL_INTERVAL_MS = 5000;
+const PREVIEW_MAX_WAIT_MS = 4 * 60 * 1000;
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function readJsonResponse(res) {
+  const rawBody = await res.text();
+  try {
+    return rawBody ? JSON.parse(rawBody) : null;
+  } catch (_) {
+    throw new Error(`生图服务暂时返回异常页面（HTTP ${res.status}），请稍后重试`);
+  }
+}
+
+async function submitPreviewTask(task, issueId, prompt, model) {
+  const formData = new FormData();
+  formData.append('image', task.image.file);
+  formData.append('taskId', task.taskId || '');
+  formData.append('issueId', issueId);
+  formData.append('prompt', prompt);
+  formData.append('designType', task.designType || 'ui');
+  if (task.goal) formData.append('goal', task.goal);
+  if (model) formData.append('model', model);
+
+  const res = await fetch('/api/generate-preview', { method: 'POST', body: formData });
+  const data = await readJsonResponse(res);
+  if (res.status !== 202 || data?.status !== 'processing' || !data?.jobId) {
+    throw new Error(mapErrorMessage(res.status, data));
+  }
+  return data;
+}
+
+async function pollPreviewTask(jobId) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < PREVIEW_MAX_WAIT_MS) {
+    await wait(PREVIEW_POLL_INTERVAL_MS);
+    const res = await fetch(`/api/generate-preview/${encodeURIComponent(jobId)}`);
+    const data = await readJsonResponse(res);
+    if (data?.status === 'success' && data?.image?.url) return data;
+    if (data?.status === 'failed' || (!res.ok && res.status !== 202)) {
+      throw new Error(mapErrorMessage(res.status, data));
+    }
+  }
+  throw new Error('效果图生成时间较长，已自动切换备用模型');
+}
+
+// 提交异步任务并轮询效果图。万相 2.6 不再占用一条长达数分钟的 HTTP 连接。
 async function generatePreview(issueId, prompt) {
   const taskId = document.querySelector('[data-task-id]')?.getAttribute('data-task-id') || '';
 
@@ -348,30 +396,16 @@ async function generatePreview(issueId, prompt) {
   updateIssueGenButton(issueId);
 
   try {
-    const formData = new FormData();
-    formData.append('image', task.image.file); // 原始 File，不是 blob URL
-    formData.append('taskId', task.taskId || '');
-    formData.append('issueId', issueId);
-    formData.append('prompt', prompt);
-    formData.append('designType', task.designType || 'ui');
-    if (task.goal) formData.append('goal', task.goal);
-
-    const res = await fetch('/api/generate-preview', { method: 'POST', body: formData });
-    // Render/上游网关异常时可能返回 HTML 错误页。不能直接 res.json()，
-    // 否则用户会看到 "Unexpected token '<'" 这类内部技术信息。
-    const rawBody = await res.text();
-    let data = null;
+    let submitted = await submitPreviewTask(task, issueId, prompt);
+    let data;
     try {
-      data = rawBody ? JSON.parse(rawBody) : null;
-    } catch (_) {
-      throw new Error(`生图服务暂时返回异常页面（HTTP ${res.status}），请稍后重试`);
-    }
-
-    if (!res.ok || data.status !== 'success') {
-      const msg = mapErrorMessage(res.status, data);
-      issueGenStates.set(issueId, { status: 'error', imageUrl: null, error: msg });
-      updateIssueGenButton(issueId);
-      return;
+      data = await pollPreviewTask(submitted.jobId);
+    } catch (primaryError) {
+      // 主模型任务明确失败或等待过久时，仅重提一次配置好的 image2 备用模型。
+      // 不把错误直接抛给用户，也不在同一 HTTP 请求内等待备用模型。
+      const fallbackModel = submitted.fallbackModel || 'qwen-image-2.0';
+      submitted = await submitPreviewTask(task, issueId, prompt, fallbackModel);
+      data = await pollPreviewTask(submitted.jobId);
     }
 
     // 成功：写回 taskStore（持久化）+ 清除临时态

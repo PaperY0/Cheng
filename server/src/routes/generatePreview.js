@@ -26,7 +26,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { ApiError } from '../middleware/errorHandler.js';
-import { generateImageWithQwenImage, IMAGE_GEN_ERRORS } from '../providers/qwenImage.js';
+import { submitImageGenerationTask, queryImageGenerationTask, IMAGE_GEN_ERRORS } from '../providers/qwenImage.js';
 
 const router = Router();
 
@@ -82,6 +82,14 @@ function validateFields(taskId, issueId, prompt, designType, goal) {
   return { errors };
 }
 
+function getAllowedModelOverride(requestedModel) {
+  if (!requestedModel) return null;
+  const primaryModel = String(process.env.QWEN_IMAGE_MODEL || 'wan2.6-image').trim();
+  const fallbackModel = String(process.env.QWEN_IMAGE_FALLBACK_MODEL || 'qwen-image-2.0').trim();
+  if (requestedModel === primaryModel || requestedModel === fallbackModel) return requestedModel;
+  throw new ApiError('IMAGE_GENERATION_ERROR', '不支持的生图模型', 400);
+}
+
 // 统一生成失败响应码映射
 // provider 抛出的 ApiError 携带 code 和 status，路由层统一包装成 IMAGE_GENERATION_ERROR。
 function toImageGenerationError(err) {
@@ -114,10 +122,11 @@ function toImageGenerationError(err) {
 }
 
 // POST /api/generate-preview
+// 只提交异步任务，立即返回 202，避免模型生成耗时占满 Render 的 HTTP 连接。
 router.post('/', upload.single('image'), async (req, res, next) => {
   const routeStart = Date.now();
   try {
-    const { taskId, issueId, prompt, designType, goal } = req.body;
+    const { taskId, issueId, prompt, designType, goal, model: requestedModel } = req.body;
     const file = req.file;
 
     // 图片校验：image 必填
@@ -142,62 +151,34 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       );
     }
 
-    // provider 调用
-    let result;
-    let usedFallback = false;
-    try {
-      result = await generateImageWithQwenImage({
-        imageBuffer: file.buffer,
-        imageMimeType: file.mimetype,
-        prompt,
-        designType,
-        goal: goal || '',
-      });
-    } catch (primaryError) {
-      const fallbackModel = String(process.env.QWEN_IMAGE_FALLBACK_MODEL || 'qwen-image-2.0').trim();
-      const shouldFallback = primaryError?.code === IMAGE_GEN_ERRORS.TIMEOUT;
-      if (!shouldFallback || !fallbackModel || fallbackModel === process.env.QWEN_IMAGE_MODEL) {
-        throw primaryError;
-      }
-      console.log('[generate-preview] 主模型超时，切换降级模型', {
-        taskId,
-        issueId,
-        primaryModel: process.env.QWEN_IMAGE_MODEL || 'wan2.6-image',
-        fallbackModel,
-      });
-      usedFallback = true;
-      result = await generateImageWithQwenImage({
-        imageBuffer: file.buffer,
-        imageMimeType: file.mimetype,
-        prompt,
-        designType,
-        goal: goal || '',
-        modelOverride: fallbackModel,
-        timeoutOverride: Number(process.env.QWEN_IMAGE_FALLBACK_TIMEOUT_MS) || 60000,
-      });
-    }
+    const modelOverride = getAllowedModelOverride(requestedModel);
+    const result = await submitImageGenerationTask({
+      imageBuffer: file.buffer,
+      imageMimeType: file.mimetype,
+      prompt,
+      designType,
+      goal: goal || '',
+      modelOverride,
+    });
 
     const elapsed = Date.now() - routeStart;
     // 业务日志（不记录 API Key、请求体、图片数据）
-    console.log('[generate-preview] 成功', {
+    console.log('[generate-preview] 任务已提交', {
       taskId,
       issueId,
-      provider: result?.model || process.env.QWEN_IMAGE_MODEL || 'wan2.6-image',
-      fallback: usedFallback,
+      provider: result.model,
       elapsed,
       requestId: result.requestId,
     });
 
-    // 成功响应
-    res.json({
+    res.status(202).json({
       taskId,
       issueId,
-      status: 'success',
+      status: 'processing',
       provider: result.model,
-      image: {
-        url: result.url,
-        expiresAt: result.expiresAt ?? null,
-      },
+      jobId: result.jobId,
+      fallbackModel: String(process.env.QWEN_IMAGE_FALLBACK_MODEL || 'qwen-image-2.0').trim(),
+      pollAfterMs: 5000,
     });
   } catch (err) {
     const elapsed = Date.now() - routeStart;
@@ -218,6 +199,31 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       return next(new ApiError('IMAGE_GENERATION_ERROR', '图片大小不能超过 10MB', 400));
     }
     // provider 异常统一包装成 IMAGE_GENERATION_ERROR
+    return next(toImageGenerationError(err));
+  }
+});
+
+// GET /api/generate-preview/:jobId
+// 前端按状态轮询，不会让一次请求被模型执行时间拖住。
+router.get('/:jobId', async (req, res, next) => {
+  try {
+    const result = await queryImageGenerationTask(req.params.jobId);
+    if (result.status === 'processing') {
+      return res.status(202).json({ status: 'processing', jobId: result.jobId, providerStatus: result.providerStatus, pollAfterMs: 5000 });
+    }
+    if (result.status === 'success') {
+      return res.json({
+        status: 'success',
+        jobId: result.jobId,
+        image: { url: result.url, expiresAt: result.expiresAt },
+      });
+    }
+    return res.status(502).json({
+      status: 'failed',
+      jobId: result.jobId,
+      error: { code: 'IMAGE_GENERATION_ERROR', message: result.message || '生图任务失败' },
+    });
+  } catch (err) {
     return next(toImageGenerationError(err));
   }
 });
