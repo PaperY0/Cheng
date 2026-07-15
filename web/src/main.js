@@ -16,6 +16,12 @@ import { releaseTaskImage, clearTask } from './taskStore.js';
 import { revealElements } from './reveal.js';
 
 const app = document.getElementById('app');
+
+// 在少数生产浏览器中，Vite 的 module 入口可能被下载却没有执行。
+// index.html 会在短暂等待后用普通 script 重试同一构建文件；此锁确保
+// 即使两个入口最终都执行，应用也只初始化一次。
+if (!window.__meishangAppStarted) {
+window.__meishangAppStarted = true;
 window.__meishangAppMounted = true;
 
 let currentUnmount = null;
@@ -187,3 +193,4 @@ function init() {
 }
 
 init();
+}

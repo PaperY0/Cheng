@@ -250,12 +250,33 @@ nav.sticky a[class*="rounded-full"]:hover {
   </div>
   <script>
     window.__meishangAppMounted = false;
-    // 模块脚本或网络发生意外时，8 秒后给出明确状态，避免用户只看到空白背景。
+    window.__meishangAppStarted = false;
+
+    // 兼容极少数会下载、却不执行 type="module" 的浏览器环境。Vite 本项目的
+    // 生产入口是自包含 IIFE，可安全作为普通脚本再次加载；main.js 内的幂等锁
+    // 会避免 module 与普通脚本同时执行时重复绑定事件。
+    window.setTimeout(function () {
+      if (window.__meishangAppMounted || window.__meishangClassicFallbackAttempted) return;
+      var moduleEntry = document.querySelector('script[type="module"][src*="/assets/"]');
+      var source = moduleEntry && moduleEntry.getAttribute('src');
+      if (!source) return;
+      window.__meishangClassicFallbackAttempted = true;
+      var fallbackEntry = document.createElement('script');
+      fallbackEntry.src = source;
+      fallbackEntry.async = false;
+      fallbackEntry.onerror = function () {
+        window.__meishangClassicFallbackFailed = true;
+      };
+      document.head.appendChild(fallbackEntry);
+    }, 1500);
+
+    // 入口和兼容回退都未能启动时，8 秒后给出明确状态，避免用户只看到空白背景。
     window.setTimeout(function () {
       if (window.__meishangAppMounted) return;
       var app = document.getElementById('app');
       if (!app) return;
-      app.innerHTML = '<main class="app-loading" style="flex-direction:column;gap:14px;padding:24px;text-align:center;"><strong style="color:#075985;font-size:18px;">应用加载较慢</strong><span style="color:#155e75;font-size:14px;">请检查网络后刷新页面。</span><button type="button" onclick="location.reload()" style="border:0;border-radius:999px;padding:10px 18px;background:#0891b2;color:#fff;cursor:pointer;">重新加载</button></main>';
+      var detail = window.__meishangClassicFallbackFailed ? '入口脚本加载失败，请检查网络后刷新页面。' : '入口脚本未启动，请刷新页面重试。';
+      app.innerHTML = '<main class="app-loading" style="flex-direction:column;gap:14px;padding:24px;text-align:center;"><strong style="color:#075985;font-size:18px;">应用加载较慢</strong><span style="color:#155e75;font-size:14px;">' + detail + '</span><button type="button" onclick="location.reload()" style="border:0;border-radius:999px;padding:10px 18px;background:#0891b2;color:#fff;cursor:pointer;">重新加载</button></main>';
     }, 8000);
   </script>
   <script type="module" src="/src/main.js"></script>
