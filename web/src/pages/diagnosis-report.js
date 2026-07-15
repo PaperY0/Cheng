@@ -60,7 +60,7 @@ export function renderDiagnosisReport(taskId) {
   const s = r.summary;
   const scores = r.scores;
   const issues = r.issues || [];
-  const created = new Date(r.generatedAt).toLocaleString('zh-CN');
+  const created = formatReportDate(r.generatedAt);
   const provider = task.provider || 'mock';
   const isMock = provider === 'mock';
   const providerLabel = isMock ? 'Mock' : '通义千问 VL';
@@ -591,6 +591,11 @@ function escapeAttr(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
+}
+
+function formatReportDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '刚刚生成' : date.toLocaleString('zh-CN');
 }
 
 function escapeHtml(s) {

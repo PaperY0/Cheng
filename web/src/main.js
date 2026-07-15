@@ -1,3 +1,4 @@
+import './tailwind.css';
 import { matchRoute, currentPath } from './router.js';
 import { renderPage, bindLinkClicks, syncNavPill } from './shell.js';
 import { renderHome } from './pages/home.js';

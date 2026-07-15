@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>美商培养工具站</title>
-  <!-- 外部 CDN 只能增强样式/图标，绝不能阻塞应用主体解析。部分网络环境下
-       jsDelivr / unpkg 会超时，使用 async 后即使 CDN 不可用也会继续渲染应用。 -->
-  <script async src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <!-- Tailwind 已在 Vite 构建阶段编译进本地产物；不再依赖运行时 CDN，避免网络波动造成页面失去布局。 -->
   <script async src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
